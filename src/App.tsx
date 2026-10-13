@@ -821,15 +821,6 @@ const searchDistrict = profile?.district || "New Delhi";
         const locName = data.name || profile.district;
         const fetchEndTime = Date.now();
         const responseTimeMs = data.debugInfo?.responseTimeMs || (fetchEndTime - fetchStartTime);
-        const weatherMain = data.weather?.[0]?.main || data.debugInfo?.condition || 'Clear';
-      .then(data => {
-        if (!active) return;
-        if (data && data.main && !data.error) {
-          const locName = data.name || profile.district;
-          const fetchEndTime = Date.now();
-          const responseTimeMs = data.debugInfo?.responseTimeMs || (fetchEndTime - fetchStartTime);
-
-          const weatherMain = data.weather?.[0]?.main || data.debugInfo?.condition || 'Clear';
           const weatherDesc = data.weather?.[0]?.description || data.debugInfo?.description || '';
           const weatherTrans = data.weather?.[0]?.translatedDescription || '';
           const mappedCondition = getWeatherConditionHindi(weatherMain, weatherDesc, weatherTrans);
