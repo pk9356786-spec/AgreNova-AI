@@ -821,10 +821,9 @@ const searchDistrict = profile?.district || "New Delhi";
         const locName = data.name || profile.district;
         const fetchEndTime = Date.now();
         const responseTimeMs = data.debugInfo?.responseTimeMs || (fetchEndTime - fetchStartTime);
-          const weatherDesc = data.weather?.[0]?.description || data.debugInfo?.description || '';
+const weatherMain = data.weather?.[0]?.main || data.debugInfo?.condition || 'Clear';
           const weatherTrans = data.weather?.[0]?.translatedDescription || '';
           const mappedCondition = getWeatherConditionHindi(weatherMain, weatherDesc, weatherTrans);
-
           const newWeatherData = {
             temp: `${data.main.temp}°C`,
             feelsLike: data.main.feels_like !== undefined ? `${data.main.feels_like}°C` : undefined,
