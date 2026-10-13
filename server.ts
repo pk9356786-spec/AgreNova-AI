@@ -11,7 +11,7 @@ const PORT = 3000;
 let aiInstance: GoogleGenAI | null = null;
 
 function getAI() {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY || process.env.VITE_GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error('GEMINI_API_KEY is not set in environment variables');
   }
