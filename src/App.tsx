@@ -812,7 +812,16 @@ function MainApp() {
     setWeatherErrorNotice(null);
 
     const fetchStartTime = Date.now();
-    safeFetchJson(`/api/weather?state=${encodeURIComponent(stateNameStr)}&district=${encodeURIComponent(profile.district)}&lang=${selectedLang}&nocache=true&t=${Date.now()}`)
+    const searchState = stateNameStr || "Delhi";
+const searchDistrict = profile?.district || "New Delhi";
+    safeFetchJson(`/api/weather?state=${encodeURIComponent(searchState)}&district=${encodeURIComponent(searchDistrict)}&lang=${selectedLang}&nocache=true&t=${Date.now()}`)
+          .then(data => {
+      if (!active) return;
+      if (data && data.main && !data.error) {
+        const locName = data.name || profile.district;
+        const fetchEndTime = Date.now();
+        const responseTimeMs = data.debugInfo?.responseTimeMs || (fetchEndTime - fetchStartTime);
+        const weatherMain = data.weather?.[0]?.main || data.debugInfo?.condition || 'Clear';
       .then(data => {
         if (!active) return;
         if (data && data.main && !data.error) {
