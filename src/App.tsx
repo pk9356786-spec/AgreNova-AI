@@ -30,6 +30,10 @@ import { FormattedMessage } from './components/FormattedMessage';
 import { WeatherEnvironmentAnimation } from './components/WeatherEnvironmentAnimation';
 import { CropAnalysisResultCard } from './components/CropAnalysisResultCard';
 import { VoiceAssistantModal } from './components/VoiceAssistantModal';
+import { AgTechHeader } from './components/AgTechHeader';
+import { CortevaVideoHero } from './components/CortevaVideoHero';
+import { CortevaThreeFeatureCards } from './components/CortevaThreeFeatureCards';
+import { CortevaCompanySection } from './components/CortevaCompanySection';
 import { SUPPORTED_LANGUAGES, getTranslation, detectInputLanguage, getTTSLangCode } from './translations';
 
 // Helper for Arabic to Hindi numerals if requested, but simple standard digits are preferred for readibility
@@ -1186,15 +1190,6 @@ const searchDistrict = profile?.district || "New Delhi";
         const transcript = event.results[0][0].transcript;
         setInputText(transcript);
         setSpokenQueryText(transcript);
-        const detected = detectInputLanguage(transcript, selectedLang);
-        if (detected && detected !== selectedLang && detected !== 'en') {
-          setSelectedLang(detected);
-          try {
-            localStorage.setItem('agrenova_lang', detected);
-          } catch (e) {
-            console.warn('localStorage write error:', e);
-          }
-        }
       };
 
       rec.onerror = (event: any) => {
@@ -1377,21 +1372,10 @@ const searchDistrict = profile?.district || "New Delhi";
     const finalQuery = queryToSubmit || inputText;
     if (!finalQuery.trim()) return;
 
-    // Auto detect language of input text (pass current selectedLang)
+    // The globally selected language is the single authoritative source of truth.
+    // The language of the user's question must NOT override the selected output language.
     const userMsg = finalQuery.trim();
-    const detected = detectInputLanguage(userMsg, selectedLang);
-    let activeLang = selectedLang;
-    // Only auto-switch language if an explicit native regional script (Devanagari, Gurmukhi, Gujarati, etc.) was typed
-    // Never auto-switch to English for Roman/Latin input unless user selected English in language selector
-    if (detected && detected !== selectedLang && detected !== 'en') {
-      activeLang = detected;
-      setSelectedLang(detected);
-      try {
-        localStorage.setItem('agrenova_lang', detected);
-      } catch (e) {
-        console.warn('localStorage write error:', e);
-      }
-    }
+    const activeLang = selectedLang;
     const currentLangObj = SUPPORTED_LANGUAGES.find(l => l.code === activeLang) || SUPPORTED_LANGUAGES[0];
 
     // Build history payload from recent turns
@@ -1438,8 +1422,52 @@ const searchDistrict = profile?.district || "New Delhi";
         })
       });
       
-      const answerText = data?.answer || 'राम-राम किसान भाई! 🙏\n\nआपकी फसल की अच्छी बढ़वार के लिए खेत में समय पर सिंचाई और संतुलित खाद (NPK) का प्रयोग करें। यदि कोई कीट या रोग के लक्षण दिखें तो तुरंत फोटो अपलोड करें।';
-      const quickReplies = data?.quickReplies || ['गेहूं की खाद प्रबंधन', 'सरसों में माहू की दवा', 'चना में उकठा रोग', 'मौसम का हाल'];
+      const defaultAnswerMap: Record<string, { answer: string; quickReplies: string[] }> = {
+        hi: {
+          answer: 'राम-राम किसान भाई! 🙏\n\nआपकी फसल की अच्छी बढ़वार के लिए खेत में समय पर सिंचाई और संतुलित खाद (NPK) का प्रयोग करें। यदि कोई कीट या रोग के लक्षण दिखें तो तुरंत फोटो अपलोड करें।',
+          quickReplies: ['गेहूं की खाद प्रबंधन', 'सरसों में माहू की दवा', 'चना में उकठा रोग', 'मौसम का हाल']
+        },
+        en: {
+          answer: 'Greetings farmer friend! 🙏\n\nFor healthy crop growth, ensure timely irrigation and balanced nutrition (NPK). If you notice any pest or disease symptoms, upload a crop photo for diagnosis.',
+          quickReplies: ['Wheat fertilizer schedule', 'Mustard aphid control', 'Gram wilt disease', 'Weather forecast']
+        },
+        mr: {
+          answer: 'राम-राम शेतकरी बांधव! 🙏\n\nआपल्या पिकाच्या चांगल्या वाढीसाठी शेतात वेळेवर पाणी आणि संतुलित खतांचा (NPK) वापर करा. किडी किंवा रोगाची लक्षणे दिसल्यास त्वरित पिकाचा फोटो अपलोड करा.',
+          quickReplies: ['गहू खत व्यवस्थापन', 'हरभरा मर रोग', 'हवामानाचा अंदाज', 'बाजार भाव']
+        },
+        gu: {
+          answer: 'નમસ્તે ખેડૂત મિત્ર! 🙏\n\nતમારા પાકની સારી વૃદ્ધિ માટે સમયસર પિયત અને સંતુલિત ખાતર (NPK) નો ઉપયોગ કરો. જો કોઈ જીવાત કે રોગના લક્ષણો જણાય તો તુરંત પાકનો ફોટો અપલોડ કરો.',
+          quickReplies: ['ઘઉંમાં ખાતર વ્યવસ્થાપન', 'જીવાત નિયંત્રણ', 'હવામાન આગાહી', 'બજાર ભાવ']
+        },
+        pa: {
+          answer: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੋ! 🙏\n\nਆਪਣੀ ਫ਼ਸਲ ਦੇ ਵਧੀਆ ਵਾਧੇ ਲਈ ਸਮੇਂ ਸਿਰ ਸਿੰਚਾਈ ਅਤੇ ਸੰਤੁਲਿਤ ਖਾਦ (NPK) ਦੀ ਵਰਤੋਂ ਕਰੋ। ਜੇਕਰ ਕੀੜੇ ਜਾਂ ਬਿਮਾਰੀ ਦੇ ਲੱਛਣ ਦਿਸਣ ਤਾਂ ਤੁਰੰਤ ਫ਼ਸਲ ਦੀ ਫ਼ੋਟੋ ਅੱਪਲੋਡ ਕਰੋ।',
+          quickReplies: ['ਕਣਕ ਦੀ ਖਾਦ ਦਾ ਸਮਾਂ', 'ਕੀੜੇ-ਮਕੌੜਿਆਂ ਦੀ ਰੋਕਥਾਮ', 'ਮੌਸਮ ਦਾ ਹਾਲ', 'ਮੰਡੀ ਭਾਅ']
+        },
+        bn: {
+          answer: 'নমস্কার কৃষক ভাই! 🙏\n\nফসলের ভালো ফলনের জন্য জমিতে সময়মতো সেচ এবং সুষম সার (NPK) ব্যবহার করুন। কোনো রোগ বা পোকার আক্রমণ দেখলে অবিলম্বে ফসলের ছবি আপলোড করুন।',
+          quickReplies: ['গমের সার ব্যবস্থাপনা', 'পোকা দমন', 'আবহাওয়ার খবর', 'মন্ডি দর']
+        },
+        ta: {
+          answer: 'வணக்கம் விவசாய நண்பரே! 🙏\n\nபயிரின் சிறந்த வளர்ச்சிக்கு சரியான நேரத்தில் பாசனமும் சமச்சீர் உரமும் (NPK) இடவும். பூச்சி அல்லது நோய் தாக்குதல் தென்பட்டால் உடனே பயிர் புகைப்படத்தை பதிவேற்றவும்.',
+          quickReplies: ['கோதுமை உர மேலாண்மை', 'பூச்சி கட்டுப்பாடு', 'வானிலை அறிக்கை', 'சந்தை விலை']
+        },
+        te: {
+          answer: 'నమస్కారం రైతు మిత్రమా! 🙏\n\nపంట మంచి దిగుబడి కోసం సకాలంలో నీటిపారుదల మరియు సమతుల్య ఎరువులను (NPK) వాడండి. పురుగులు లేదా తెగుళ్ల లక్షణాలు కనిపిస్తే వెంటనే పంట ఫోటోను అప్‌లోడ్ చేయండి.',
+          quickReplies: ['గోధుమ ఎరువుల నిర్వహణ', 'తెగుళ్ల నివారణ', 'వాతావరణ వివరాలు', 'మార్కెట్ ధరలు']
+        },
+        kn: {
+          answer: 'ನಮಸ್ಕಾರ ರೈತ ಮಿತ್ರರೇ! 🙏\n\nಬೆಳೆಯ ಉತ್ತಮ ಇಳುವರಿಗಾಗಿ ಸಕಾಲಿಕ ನೀರಾವರಿ ಮತ್ತು ಸಮತೋಲಿತ ರಸಗೊಬ್ಬರ (NPK) ಬಳಸಿ. ಕೀಟ ಅಥವಾ ರೋಗದ ಲಕ್ಷಣಗಳು ಕಂಡುಬಂದರೆ ತಕ್ಷಣ ಬೆಳೆಯ ಫೋಟೋ ಅಪ್‌ಲೋಡ್ ಮಾಡಿ.',
+          quickReplies: ['ಗೋಧಿ ಗೊಬ್ಬರ ನಿರ್ವಹಣೆ', 'ಕೀಟ ನಿಯಂತ್ರಣ', 'ಹವಾಮಾನ ಮುನ್ಸೂಚನೆ', 'ಮಾರುಕಟ್ಟೆ ದರ']
+        },
+        ml: {
+          answer: 'നമസ്കാരം കർഷക സുഹൃത്തേ! 🙏\n\nവിളയുടെ നല്ല വളർച്ചയ്ക്ക് കൃത്യസമയത്ത് ജലസേചനവും സന്തുലിത വളപ്രയോഗവും (NPK) ഉറപ്പാക്കുക. കീടങ്ങളോ രോഗലക്ഷണങ്ങളോ കണ്ടാൽ ഉടൻ വിളയുടെ ഫോട്ടോ അപ്‌ലോഡ് ചെയ്യുക.',
+          quickReplies: ['ഗോതമ്പ് വളപ്രയോഗം', 'കീടനിയന്ത്രണം', 'കാലാവസ്ഥ പ്രവചനം', 'വിപണി നിരക്കുകൾ']
+        }
+      };
+
+      const defaultObj = defaultAnswerMap[activeLang] || defaultAnswerMap.en;
+      const answerText = data?.answer || defaultObj.answer;
+      const quickReplies = (data?.quickReplies && data.quickReplies.length > 0) ? data.quickReplies : defaultObj.quickReplies;
 
       // Append answer to chatbot state
       setChatMessages(prev => [...prev, { 
@@ -1461,26 +1489,107 @@ const searchDistrict = profile?.district || "New Delhi";
         }
       }
 
-      // Add to persistent History List
+      // Add to persistent History List with localized headings
+      const titlePrefixMap: Record<string, string> = {
+        hi: 'किसान मित्र संवाद',
+        en: 'Kisaan Mitra Chat',
+        mr: 'शेतकरी मित्र संवाद',
+        gu: 'ખેડૂત મિત્ર સંવાદ',
+        pa: 'ਕਿਸਾਨ ਮਿੱਤਰ ਗੱਲਬਾਤ',
+        bn: 'কিষাণ মিত্র আলাপচারিতা',
+        ta: 'உழவர் நண்பன் கலந்துரையாடல்',
+        te: 'రైతు మిత్ర సంభాషణ',
+        kn: 'ರೈತ ಮಿತ್ರ ಸಂವಾದ',
+        ml: 'കിസാൻ മിത്ര സംവാദം'
+      };
+      const advicePrefixMap: Record<string, string> = {
+        hi: 'कृषि विशेषज्ञ की सलाह:',
+        en: 'Agronomy Expert Advisory:',
+        mr: 'कृषी तज्ज्ञांचा सल्ला:',
+        gu: 'કૃષિ નિષ્ણાતની સલાહ:',
+        pa: 'ਖੇਤੀਬਾੜੀ ਮਾਹਿਰ ਦੀ ਸਲਾਹ:',
+        bn: 'কৃষি বিশেষজ্ঞের পরামর্শ:',
+        ta: 'வேளாண் நிபுணர் ஆலோசனை:',
+        te: 'వ్యవసాయ నిపుణుడి సలహా:',
+        kn: 'ಕೃಷಿ ತಜ್ಞರ ಸಲಹೆ:',
+        ml: 'കാർഷിക വിദഗ്ദ്ധന്റെ ഉപദേശം:'
+      };
+      const titlePrefix = titlePrefixMap[activeLang] || titlePrefixMap.en;
+      const advicePrefix = advicePrefixMap[activeLang] || advicePrefixMap.en;
+
       const newHistoryItem: PastReport = {
         id: 'q_' + Date.now(),
         date: getHindiDate(),
         type: 'question',
-        title: `किसान मित्र संवाद: "${userMsg.slice(0, 30)}${userMsg.length > 30 ? '...' : ''}"`,
-        subTitle: data?.cropMentioned || 'सामान्य कृषि परामर्श',
+        title: `${titlePrefix}: "${userMsg.slice(0, 30)}${userMsg.length > 30 ? '...' : ''}"`,
+        subTitle: data?.cropMentioned || (activeLang === 'hi' ? 'सामान्य कृषि परामर्श' : 'Agronomy Advisory'),
         imageUrl: null,
-        description: `आपके प्रश्न "${userMsg}" पर कृषि विशेषज्ञ की सलाह:`,
+        description: `"${userMsg}" - ${advicePrefix}`,
         advice: answerText
       };
       setHistoryList(prev => [newHistoryItem, ...prev]);
 
     } catch (err: any) {
       console.error(err);
-      setQuestionError('सलाह प्राप्त करने में समस्या हुई। कृपया दोबारा प्रयास करें।');
+      const errorMap: Record<string, { errorMsg: string; botText: string; quickReplies: string[] }> = {
+        hi: {
+          errorMsg: 'सलाह प्राप्त करने में समस्या हुई। कृपया दोबारा प्रयास करें।',
+          botText: '⚠️ **उत्तर प्राप्त करने में तकनीकी रुकावट आई**\n\nइंटरनेट कनेक्टिविटी या सर्वर व्यस्तता के कारण उत्तर नहीं मिल सका। कृपया नीचे दिए विकल्पों में से किसी एक को चुनें:',
+          quickReplies: ['🔄 पुनः प्रयास करें', '📞 किसान कॉल सेंटर 1800-180-1551', '📸 रोग जांच हेतु फ़ोटो लें']
+        },
+        en: {
+          errorMsg: 'Unable to fetch advisory. Please try again.',
+          botText: '⚠️ **Technical disruption in retrieving response**\n\nCould not fetch response due to temporary network or server load. Please choose one of the options below:',
+          quickReplies: ['🔄 Try Again', '📞 Kisan Call Center 1800-180-1551', '📸 Take Photo for Disease Check']
+        },
+        mr: {
+          errorMsg: 'सल्ला मिळवण्यात अडचण आली. कृपया पुन्हा प्रयत्न करा.',
+          botText: '⚠️ **माहिती मिळवण्यात तांत्रिक अडचण आली**\n\nकृपया खालील पर्यायांपैकी एक निवडा किंवा पुन्हा प्रयत्न करा:',
+          quickReplies: ['🔄 पुन्हा प्रयत्न करा', '📞 किसान कॉल सेंटर 1800-180-1551', '📸 पिकाचा फोटो घ्या']
+        },
+        gu: {
+          errorMsg: 'સલાહ મેળવવામાં મુશ્કેલી આવી. કૃપા કરીને ફરી પ્રયાસ કરો.',
+          botText: '⚠️ **ટેકનિકલ સમસ્યા આવી છે**\n\nસર્વર અથવા કનેક્ટિવિટી સમસ્યાને કારણે ઉત્તર મળી શક્યો નથી. કૃપા કરીને નીચેના વિકલ્પોમાંથી પસંદ કરો:',
+          quickReplies: ['🔄 ફરી પ્રયાસ કરો', '📞 કિસાન કૉલ સેન્ટર 1800-180-1551', '📸 રોગ તપાસ માટે ફોટો લો']
+        },
+        pa: {
+          errorMsg: 'ਸਲਾਹ ਪ੍ਰਾਪਤ ਕਰਨ ਵਿੱਚ ਸਮੱਸਿਆ ਆਈ। ਕਿਰਪਾ ਕਰਕੇ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ।',
+          botText: '⚠️ **ਤਕਨੀਕੀ ਰੁਕਾਵਟ ਆਈ**\n\nਕਿਰਪਾ ਕਰਕੇ ਹੇਠਾਂ ਦਿੱਤੇ ਵਿਕਲਪਾਂ ਵਿੱਚੋਂ ਇੱਕ ਚੁਣੋ ਜਾਂ ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ:',
+          quickReplies: ['🔄 ਦੁਬਾਰਾ ਕੋਸ਼ਿਸ਼ ਕਰੋ', '📞 ਕਿਸਾਨ ਕਾਲ ਸੈਂਟਰ 1800-180-1551', '📸 ਫ਼ਸਲ ਦੀ ਫ਼ੋਟੋ ਲਓ']
+        },
+        bn: {
+          errorMsg: 'পরামর্শ পেতে সমস্যা হয়েছে। অনুগ্রহ করে আবার চেষ্টা করুন।',
+          botText: '⚠️ **প্রযুক্তিগত বিভ্রাট ঘটেছে**\n\nঅনুগ্রহ করে নীচের বিকল্পগুলির একটি বেছে নিন অথবা আবার চেষ্টা করুন:',
+          quickReplies: ['🔄 আবার চেষ্টা করুন', '📞 কিষাণ কল সেন্টার 1800-180-1551', '📸 রোগ পরীক্ষার জন্য ছবি তুলুন']
+        },
+        ta: {
+          errorMsg: 'ஆலோசனையைப் பெறுவதில் சிக்கல் ஏற்பட்டது. மீண்டும் முயற்சிக்கவும்.',
+          botText: '⚠️ **தொழில்நுட்ப கோளாறு ஏற்பட்டது**\n\nபதில் பெறுவதில் தாமதம் ஏற்பட்டுள்ளது. தயவுசெய்து கீழே உள்ள விருப்பங்களில் ஒன்றைத் தேர்ந்தெடுக்கவும்:',
+          quickReplies: ['🔄 மீண்டும் முயற்சிக்கவும்', '📞 உழவர் அழைப்பு மையம் 1800-180-1551', '📸 நோய் கண்டறிய புகைப்படம் எடுக்கவும்']
+        },
+        te: {
+          errorMsg: 'సలహా పొందడంలో సమస్య ఎదురైంది. దయచేసి మళ్లీ ప్రయత్నించండి.',
+          botText: '⚠️ **సాంకేతిక అంతరాయం ఏర్పడింది**\n\nదయచేసి క్రింది ఎంపికలలో ఒకదాన్ని ఎంచుకోండి లేదా మళ్లీ ప్రయత్నించండి:',
+          quickReplies: ['🔄 మళ్లీ ప్రయత్నించండి', '📞 కిసాన్ కాల్ సెంటర్ 1800-180-1551', '📸 తెగులు పరీక్ష కోసం ఫోటో తీయండి']
+        },
+        kn: {
+          errorMsg: 'ಸಲಹೆ ಪಡೆಯುವಲ್ಲಿ ಸಮಸ್ಯೆಯಾಗಿದೆ. ದಯವಿಟ್ಟು ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ.',
+          botText: '⚠️ **ತಾಂತ್ರಿಕ ಅಡಚಣೆ ಉಂಟಾಗಿದೆ**\n\nದಯವಿಟ್ಟು ಕೆಳಗಿನ ಆಯ್ಕೆಗಳಲ್ಲಿ ಒಂದನ್ನು ಆಯ್ಕೆಮಾಡಿ ಅಥವಾ ಪುನಃ ಪ್ರಯತ್ನಿಸಿ:',
+          quickReplies: ['🔄 ಮತ್ತೆ ಪ್ರಯತ್ನಿಸಿ', '📞 ಕಿಸಾನ್ ಕಾಲ್ ಸೆಂಟರ್ 1800-180-1551', '📸 ರೋಗ ತಪಾಸಣೆಗೆ ಫೋಟೋ ತೆಗೆಯಿರಿ']
+        },
+        ml: {
+          errorMsg: 'ഉപദേശം ലഭ്യമാക്കുന്നതിൽ തടസ്സം നേരിട്ടു. വീണ്ടും ശ്രമിക്കുക.',
+          botText: '⚠️ **സാങ്കേതിക തടസ്സം ഉണ്ടായിരിക്കുന്നു**\n\nദയവായി താഴെ പറയുന്ന ഓപ്ഷനുകളിൽ ഒന്ന് തിരഞ്ഞെടുക്കുക അല്ലെങ്കിൽ വീണ്ടും ശ്രമിക്കുക:',
+          quickReplies: ['🔄 വീണ്ടും ശ്രമിക്കുക', '📞 കിസാൻ കോൾ സെന്റർ 1800-180-1551', '📸 രോഗനിർണയത്തിനായി ഫോട്ടോ എടുക്കുക']
+        }
+      };
+
+      const errObj = errorMap[activeLang] || errorMap.en;
+      setQuestionError(errObj.errorMsg);
       setChatMessages(prev => [...prev, { 
         sender: 'bot', 
-        text: '⚠️ **उत्तर प्राप्त करने में तकनीकी रुकावट आई**\n\nइंटरनेट कनेक्टिविटी या सर्वर व्यस्तता के कारण उत्तर नहीं मिल सका। कृपया नीचे दिए विकल्पों में से किसी एक को चुनें:', 
-        quickReplies: ['🔄 पुनः प्रयास करें', '📞 किसान कॉल सेंटर 1800-180-1551', '📸 रोग जांच हेतु फ़ोटो लें']
+        text: errObj.botText, 
+        quickReplies: errObj.quickReplies 
       }]);
     } finally {
       setIsAskingQuestion(false);
@@ -1669,6 +1778,201 @@ const searchDistrict = profile?.district || "New Delhi";
         setSelectedPastReport(null);
       }
     }
+  };
+
+  const renderWeatherCard = () => {
+    const rawMain = (weatherAdvisory?.debugInfo?.condition || '').trim();
+    const rawDesc = (weatherAdvisory?.debugInfo?.description || '').toLowerCase().trim();
+    const rawCond = (weatherAdvisory?.condition || '').toLowerCase().trim();
+    const mainLower = rawMain.toLowerCase();
+
+    let weatherIcon = '☀️';
+    if (mainLower === 'thunderstorm' || rawDesc.includes('thunderstorm') || rawCond.includes('thunder') || rawCond.includes('तूफान')) {
+      weatherIcon = '⛈️';
+    } else if (mainLower === 'drizzle' || rawDesc.includes('drizzle')) {
+      weatherIcon = '🌦️';
+    } else if (mainLower === 'rain' || rawDesc.includes('rain') || rawCond.includes('बारिश') || rawCond.includes('वर्षा')) {
+      weatherIcon = '🌧️';
+    } else if (mainLower === 'clouds' || rawDesc.includes('cloud') || rawCond.includes('बादल')) {
+      if (rawDesc.includes('broken') || rawDesc.includes('overcast') || rawCond.includes('घने')) {
+        weatherIcon = '☁️';
+      } else {
+        weatherIcon = '⛅';
+      }
+    } else if (mainLower === 'mist' || mainLower === 'fog' || mainLower === 'haze' || mainLower === 'smoke' || rawDesc.includes('mist') || rawDesc.includes('fog') || rawDesc.includes('haze') || rawDesc.includes('smoke') || rawCond.includes('धुंध') || rawCond.includes('कोहरा')) {
+      weatherIcon = '🌫️';
+    } else {
+      weatherIcon = '☀️';
+    }
+
+    const cleanTemp = (weatherAdvisory?.temp || '35°C').replace(/[\s.]*$/, '').trim();
+    const cleanCond = (weatherAdvisory?.condition || 'साफ़ और धूप भरा मौसम').replace(/^[.\s•]+/, '').trim();
+    const displayLoc = formatLocationDisplay(profile.district, profile.state);
+
+    return (
+      <div 
+        id="weather-emerald-card"
+        className="bg-gradient-to-r from-[#062a1d] via-[#083624] to-[#0a3d2b] text-white p-5 sm:p-6 md:p-8 rounded-3xl border border-emerald-700/50 relative overflow-hidden flex flex-col justify-between gap-5 transition-all duration-300 shadow-lg"
+      >
+        {/* Automatic Weather Environment Animation Overlay */}
+        <WeatherEnvironmentAnimation 
+          conditionMain={weatherAdvisory?.debugInfo?.condition}
+          conditionDesc={weatherAdvisory?.debugInfo?.description}
+          conditionHindi={weatherAdvisory?.condition}
+        />
+
+        {/* Top Badge Header Row */}
+        <div className="flex items-center justify-between gap-3 relative z-10 flex-wrap">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 text-xs font-bold shadow-2xs">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
+              <span>लाइव मौसम व कृषि पूर्वानुमान</span>
+            </div>
+            <span className="text-xs text-emerald-300/80 font-medium hidden sm:inline">
+              📍 {displayLoc}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-2">
+            {isWeatherLoading && (
+              <span className="text-[10px] text-emerald-200 bg-white/10 px-2.5 py-1 rounded-full flex items-center gap-1.5 font-semibold">
+                <span className="w-2 h-2 border border-white border-t-transparent rounded-full animate-spin"></span>
+                अपडेट हो रहा है...
+              </span>
+            )}
+            <button
+              type="button"
+              id="btn-share-weather"
+              onClick={handleShareWeather}
+              title="मौसम साझा करें"
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-all active:scale-95 cursor-pointer shrink-0 shadow-xs"
+            >
+              <Share2 className="w-3.5 h-3.5 text-emerald-200" />
+            </button>
+            <button
+              type="button"
+              id="btn-refresh-weather"
+              onClick={handleRefreshWeather}
+              title="मौसम रिफ्रेश करें"
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-all active:scale-95 cursor-pointer shrink-0 shadow-xs"
+            >
+              <RefreshCw className={`w-3.5 h-3.5 text-emerald-200 ${isWeatherLoading ? 'animate-spin' : ''}`} />
+            </button>
+          </div>
+        </div>
+
+        {isWeatherLoading && !weatherAdvisory ? (
+          <div className="flex items-center gap-3 py-8 px-2 text-emerald-100 font-semibold z-10 min-h-[120px]">
+            <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0"></div>
+            <span className="text-sm font-bold">मौसम का डेटा लोड हो रहा है...</span>
+          </div>
+        ) : weatherAdvisory ? (
+          <div className="z-10 flex flex-col gap-5">
+            {/* Main Center Area: Left Core Weather Data, Right Metrics */}
+            <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-5">
+              
+              {/* Left Side: Glowing Icon, Large Temp & Condition, Location, OpenWeather API tag */}
+              <div className="flex items-center gap-4">
+                {/* Glowing Weather Icon */}
+                <div className="w-16 h-16 rounded-2xl bg-white/10 border border-emerald-400/30 flex items-center justify-center text-4xl shrink-0 shadow-inner">
+                  {weatherIcon}
+                </div>
+
+                <div>
+                  {/* Large Active Temperature & Condition */}
+                  <div className="flex items-baseline gap-2.5 flex-wrap sm:flex-nowrap">
+                    <span className="text-4xl sm:text-5xl font-black text-white tracking-tight leading-none drop-shadow-xs">
+                      {cleanTemp}
+                    </span>
+                    <span className="text-lg sm:text-xl font-extrabold text-emerald-100 whitespace-nowrap leading-none flex items-center gap-2">
+                      <span>•</span>
+                      <span>{cleanCond}</span>
+                    </span>
+                  </div>
+
+                  {/* Location & Metadata Attribution */}
+                  <div className="flex items-center gap-2 mt-2 flex-wrap">
+                    <p className="text-xs text-emerald-200 font-semibold flex items-center gap-1">
+                      📍 {displayLoc} (स्थानीय केंद्र)
+                    </p>
+                    <span className="text-emerald-500/60 hidden sm:inline">•</span>
+                    <span className="text-[11px] text-emerald-300/80 font-medium">
+                      🌐 {!weatherIsCached ? 'OpenWeather API (Live Data)' : 'कैश्ड मौसम डेटा'}
+                    </span>
+                  </div>
+                </div>
+              </div>
+
+              {/* Right Side: Micro-Metrics Strip */}
+              <div className="grid grid-cols-4 gap-3 sm:gap-4 bg-black/25 backdrop-blur-xs p-3.5 sm:p-4 rounded-2xl border border-white/10 w-full md:w-auto text-center">
+                <div className="flex flex-col items-center">
+                  <span className="text-[11px] text-emerald-300 font-medium">💧 नमी</span>
+                  <strong className="text-xs sm:text-sm font-black text-white mt-0.5">{weatherAdvisory.humidity || '63%'}</strong>
+                </div>
+                <div className="flex flex-col items-center border-l border-white/10 pl-3 sm:pl-4">
+                  <span className="text-[11px] text-emerald-300 font-medium">💨 हवा</span>
+                  <strong className="text-xs sm:text-sm font-black text-white mt-0.5">{weatherAdvisory.windSpeed || '3.09 m/s'}</strong>
+                </div>
+                <div className="flex flex-col items-center border-l border-white/10 pl-3 sm:pl-4">
+                  <span className="text-[11px] text-emerald-300 font-medium">☁️ बादल</span>
+                  <strong className="text-xs sm:text-sm font-black text-white mt-0.5">{weatherAdvisory.clouds || '65%'}</strong>
+                </div>
+                <div className="flex flex-col items-center border-l border-white/10 pl-3 sm:pl-4">
+                  <span className="text-[11px] text-emerald-300 font-medium">🌧️ वर्षा</span>
+                  <strong className="text-xs sm:text-sm font-black text-white mt-0.5">{weatherAdvisory.rainProbability || '0%'}</strong>
+                </div>
+              </div>
+
+            </div>
+
+            {/* Integrated Bottom Advisory Strip */}
+            <div className="bg-[#031d14]/90 border border-emerald-800/60 rounded-2xl px-4 sm:px-5 py-3 flex items-center gap-3 text-xs text-white">
+              <Sparkles className="w-5 h-5 text-amber-400 shrink-0" />
+              <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-2 flex-1">
+                <span className="text-amber-300 font-bold shrink-0">🌾 कृषि एवं छिड़काव सलाह:</span>
+                <p className="text-emerald-50 font-medium leading-relaxed">
+                  {(() => {
+                    let adv = weatherAdvisory.advisory || 'आज का मौसम अनुकूल है। फसल छिड़काव, खाद प्रबंधन व अन्य कृषि कार्य किए जा सकते हैं।';
+                    adv = adv.replace(/\s*\([^)]*आर्द्रता:[^)]*\)/g, '').replace(/\s*\([^)]*Humidity:[^)]*\)/g, '').trim();
+                    if (!adv || adv.includes('आर्द्रता:') || adv.includes('Humidity:')) {
+                      adv = weatherAdvisory.isSpraySafe
+                        ? 'आज का मौसम फसल छिड़काव और कृषि कार्यों के लिए अनुकूल है।'
+                        : 'मौसम में बदलाव संभव है। कीटनाशक छिड़काव व सिंचाई ध्यानपूर्वक करें।';
+                    }
+                    return adv;
+                  })()}
+                </p>
+              </div>
+              <div className={`px-2.5 py-1 rounded-lg text-[10px] font-black shrink-0 ${
+                weatherAdvisory.isSpraySafe !== false 
+                  ? 'bg-emerald-500/20 text-emerald-300 border border-emerald-400/30' 
+                  : 'bg-rose-500/20 text-rose-300 border border-rose-400/30'
+              }`}>
+                {weatherAdvisory.isSpraySafe !== false ? '✓ छिड़काव अनुकूल' : '⚠️ छिड़काव टालें'}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 py-6 px-2 text-emerald-100 z-10 min-h-[100px]">
+            <div className="flex items-center gap-3">
+              <AlertCircle className="w-6 h-6 text-amber-300 shrink-0" />
+              <div>
+                <h4 className="text-sm font-bold text-white">{getTranslation(selectedLang, 'weather_unavailable_title')}</h4>
+                <p className="text-xs text-emerald-200 mt-0.5">{getTranslation(selectedLang, 'weather_unavailable_sub')}</p>
+              </div>
+            </div>
+            <button
+              type="button"
+              onClick={handleRefreshWeather}
+              className="bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
+            >
+              <RefreshCw className="w-3.5 h-3.5" />
+              <span>{getTranslation(selectedLang, 'retry_weather_btn')}</span>
+            </button>
+          </div>
+        )}
+      </div>
+    );
   };
 
   const renderMandiMspCard = () => {
@@ -1897,44 +2201,20 @@ const searchDistrict = profile?.district || "New Delhi";
 
   return (
     <div className="min-h-screen bg-slate-50 text-slate-800 flex flex-col font-sans antialiased scrollbar-none">
-      {/* 100% Full-Width Solid Deep Agri-Green Header (#002C23) - Clean Single Header with Hamburger Menu */}
-      <header id="app-header" className="w-full bg-[#002C23] border-b border-[#00382d] shadow-md z-[200] sticky top-0">
-        {/* Main Header Bar */}
-        <div className="w-full px-3.5 sm:px-6 md:px-8 py-2.5 sm:py-3 flex flex-row items-center justify-between gap-3 sm:gap-4">
-          {/* Left: Brand Logo + Title + Subtitle */}
-          <div 
-            className="flex items-center gap-2.5 sm:gap-3 shrink-0 cursor-pointer"
-            onClick={() => { setActiveTab('home'); setSelectedPastReport(null); }}
-          >
-            <div id="logo" className="w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center shrink-0">
-              <AgreNovaLogoIcon className="w-8 h-8 sm:w-10 sm:h-10" alt="AgreNova AI Logo" />
-            </div>
-            <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-1.5">
-                <h1 id="app-title" className="text-lg sm:text-2xl font-black text-white tracking-tight flex items-center gap-1.5 leading-none">
-                  AgreNova <span className="text-[#34D399] font-black">AI</span>
-                </h1>
-              </div>
-              <p className="text-[10px] sm:text-xs text-emerald-100/90 font-medium leading-normal tracking-wide mt-0.5">
-                {getTranslation(selectedLang, 'app_tagline') || 'AI for Smarter Agriculture'}
-              </p>
-            </div>
-          </div>
-          
-          {/* Right: Single Hamburger Menu Button (☰) */}
-          <div className="flex items-center shrink-0">
-            <button
-              id="hamburger-menu-btn"
-              onClick={() => setIsMenuDrawerOpen(true)}
-              aria-label="मेनू खोलें"
-              title="मेनू (Menu)"
-              className="w-10 h-10 sm:w-11 sm:h-11 rounded-xl bg-[#003d31] hover:bg-[#004739] active:scale-95 text-white border border-[#004e3e] flex items-center justify-center transition-all shadow-sm cursor-pointer"
-            >
-              <Menu className="w-5 h-5 sm:w-6 sm:h-6 text-emerald-100" />
-            </button>
-          </div>
-        </div>
-      </header>
+      {/* Modern AGRIVI-Inspired Clean Website Top Bar */}
+      <AgTechHeader
+        activeTab={activeTab}
+        setActiveTab={(t) => {
+          setActiveTab(t);
+          setSelectedPastReport(null);
+        }}
+        selectedLang={selectedLang}
+        setSelectedLang={setSelectedLang}
+        profile={profile}
+        onOpenProfile={() => setIsProfileModalOpen(true)}
+        onOpenDrawer={() => setIsMenuDrawerOpen(true)}
+        onOpenVoiceModal={openVoiceModal}
+      />
 
       {/* Slide-out Navigation Drawer Menu */}
       <AnimatePresence>
@@ -1956,24 +2236,19 @@ const searchDistrict = profile?.district || "New Delhi";
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 25, stiffness: 280 }}
-              className="relative w-80 max-w-[85vw] h-full bg-[#07271b] border-l border-[#00382d] shadow-2xl flex flex-col z-10 overflow-hidden"
+              className="relative w-80 sm:w-96 max-w-[85vw] h-full bg-white border-l border-slate-200 shadow-2xl flex flex-col z-10 overflow-hidden"
             >
               {/* Drawer Top Header */}
-              <div className="bg-[#002C23] text-white px-5 py-4 flex items-center justify-between border-b border-[#00382d]">
+              <div className="bg-white text-slate-900 px-5 py-4 flex items-center justify-between border-b border-slate-100">
                 <div className="flex items-center gap-2.5">
-                  <AgreNovaLogoIcon className="w-7 h-7" alt="AgreNova Logo" />
-                  <div>
-                    <h2 className="text-base font-black tracking-tight text-white leading-none">
-                      AgreNova <span className="text-[#34D399]">AI</span>
-                    </h2>
-                    <p className="text-[10px] text-emerald-200/90 font-medium mt-0.5">
-                      {getTranslation(selectedLang, 'app_tagline') || 'AI for Smarter Agriculture'}
-                    </p>
-                  </div>
+                  <AgreNovaLogoIcon className="w-7 h-7 shrink-0" alt="AgreNova Logo" />
+                  <span className="text-lg font-black tracking-tight text-slate-900 select-none">
+                    AgreNova <span className="text-emerald-600">AI</span>
+                  </span>
                 </div>
                 <button
                   onClick={() => setIsMenuDrawerOpen(false)}
-                  className="w-8 h-8 rounded-lg bg-[#003d31] hover:bg-[#004739] text-emerald-100 flex items-center justify-center cursor-pointer transition-colors"
+                  className="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 hover:text-slate-900 flex items-center justify-center cursor-pointer transition-colors"
                   aria-label="बंद करें"
                   title="बंद करें"
                 >
@@ -1993,39 +2268,18 @@ const searchDistrict = profile?.district || "New Delhi";
                   }}
                   className={`w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
                     activeTab === 'home'
-                      ? 'bg-emerald-900/70 text-white font-black border border-emerald-500/50 shadow-inner ring-1 ring-emerald-500/30'
-                      : 'text-slate-100 hover:bg-[#0f3b2c] hover:text-white'
+                      ? 'bg-emerald-50 text-emerald-950 font-black border border-emerald-300 ring-1 ring-emerald-400/20 shadow-xs'
+                      : 'text-slate-700 hover:bg-emerald-50/70 hover:text-emerald-950'
                   }`}
                 >
-                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-emerald-500 text-white shadow-md shadow-emerald-950/50">
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-emerald-600 text-white shadow-xs">
                     <Home className="w-4 h-4 text-white stroke-[2.5]" />
                   </span>
                   <span className="flex-1">{getTranslation(selectedLang, 'nav_home')}</span>
-                  {activeTab === 'home' && <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shadow-sm shadow-emerald-400/50"></span>}
+                  {activeTab === 'home' && <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shadow-xs"></span>}
                 </button>
 
-                {/* 2. कृषि कैलकुलेटर (Calculators) */}
-                <button
-                  id="menu-item-tools"
-                  onClick={() => {
-                    setActiveTab('tools');
-                    setSelectedPastReport(null);
-                    setIsMenuDrawerOpen(false);
-                  }}
-                  className={`w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
-                    activeTab === 'tools'
-                      ? 'bg-teal-900/70 text-white font-black border border-teal-500/50 shadow-inner ring-1 ring-teal-500/30'
-                      : 'text-slate-100 hover:bg-[#0f3b2c] hover:text-white'
-                  }`}
-                >
-                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white shadow-md shadow-teal-950/50">
-                    <Calculator className="w-4 h-4 text-white stroke-[2.5]" />
-                  </span>
-                  <span className="flex-1">{getTranslation(selectedLang, 'nav_tools')}</span>
-                  {activeTab === 'tools' && <span className="w-2 h-2 rounded-full bg-teal-400 animate-pulse shadow-sm shadow-teal-400/50"></span>}
-                </button>
-
-                {/* 3. MSP दरें (MSP Rates) */}
+                {/* 2. MSP दरें (MSP Rates) */}
                 <button
                   id="menu-item-msp"
                   onClick={() => {
@@ -2035,18 +2289,39 @@ const searchDistrict = profile?.district || "New Delhi";
                   }}
                   className={`w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
                     activeTab === 'msp'
-                      ? 'bg-amber-950/70 text-amber-100 font-black border border-amber-500/50 shadow-inner ring-1 ring-amber-500/30'
-                      : 'text-slate-100 hover:bg-[#0f3b2c] hover:text-white'
+                      ? 'bg-amber-50 text-amber-950 font-black border border-amber-300 ring-1 ring-amber-400/20 shadow-xs'
+                      : 'text-slate-700 hover:bg-amber-50/70 hover:text-amber-950'
                   }`}
                 >
-                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-amber-400 to-yellow-500 text-slate-950 shadow-md shadow-amber-950/50">
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-amber-400 to-yellow-500 text-slate-950 shadow-xs">
                     <TrendingUp className="w-4 h-4 text-slate-950 stroke-[2.7]" />
                   </span>
                   <span className="flex-1">{getTranslation(selectedLang, 'nav_msp')}</span>
-                  {activeTab === 'msp' && <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse shadow-sm shadow-amber-400/50"></span>}
+                  {activeTab === 'msp' && <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shadow-xs"></span>}
                 </button>
 
-                {/* 4. सरकारी योजनाएं (Government Schemes) */}
+                {/* 3. कृषि कैलकुलेटर (Agri Calculator) */}
+                <button
+                  id="menu-item-tools"
+                  onClick={() => {
+                    setActiveTab('tools');
+                    setSelectedPastReport(null);
+                    setIsMenuDrawerOpen(false);
+                  }}
+                  className={`w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
+                    activeTab === 'tools'
+                      ? 'bg-teal-50 text-teal-950 font-black border border-teal-300 ring-1 ring-teal-400/20 shadow-xs'
+                      : 'text-slate-700 hover:bg-teal-50/70 hover:text-teal-950'
+                  }`}
+                >
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-emerald-500 via-teal-500 to-cyan-600 text-white shadow-xs">
+                    <Calculator className="w-4 h-4 text-white stroke-[2.5]" />
+                  </span>
+                  <span className="flex-1">{getTranslation(selectedLang, 'nav_tools')}</span>
+                  {activeTab === 'tools' && <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse shadow-xs"></span>}
+                </button>
+
+                {/* 4. सरकारी योजनाएं (Govt Schemes) */}
                 <button
                   id="menu-item-schemes"
                   onClick={() => {
@@ -2056,18 +2331,18 @@ const searchDistrict = profile?.district || "New Delhi";
                   }}
                   className={`w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
                     activeTab === 'schemes'
-                      ? 'bg-indigo-950/70 text-indigo-100 font-black border border-indigo-500/50 shadow-inner ring-1 ring-indigo-500/30'
-                      : 'text-slate-100 hover:bg-[#0f3b2c] hover:text-white'
+                      ? 'bg-indigo-50 text-indigo-950 font-black border border-indigo-300 ring-1 ring-indigo-400/20 shadow-xs'
+                      : 'text-slate-700 hover:bg-indigo-50/70 hover:text-indigo-950'
                   }`}
                 >
-                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-md shadow-indigo-950/50">
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-xs">
                     <Award className="w-4 h-4 text-white stroke-[2.5]" />
                   </span>
                   <span className="flex-1">{getTranslation(selectedLang, 'nav_schemes')}</span>
-                  {activeTab === 'schemes' && <span className="w-2 h-2 rounded-full bg-indigo-400 animate-pulse shadow-sm shadow-indigo-400/50"></span>}
+                  {activeTab === 'schemes' && <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shadow-xs"></span>}
                 </button>
 
-                {/* 5. जांच इतिहास (Scan / Diagnosis History) */}
+                {/* 5. जांच इतिहास (Saved History) */}
                 <button
                   id="menu-item-history"
                   onClick={() => {
@@ -2077,18 +2352,18 @@ const searchDistrict = profile?.district || "New Delhi";
                   }}
                   className={`w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
                     activeTab === 'history'
-                      ? 'bg-sky-950/70 text-sky-100 font-black border border-sky-500/50 shadow-inner ring-1 ring-sky-500/30'
-                      : 'text-slate-100 hover:bg-[#0f3b2c] hover:text-white'
+                      ? 'bg-sky-50 text-sky-950 font-black border border-sky-300 ring-1 ring-sky-400/20 shadow-xs'
+                      : 'text-slate-700 hover:bg-sky-50/70 hover:text-sky-950'
                   }`}
                 >
-                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-sky-400 to-blue-600 text-white shadow-md shadow-sky-950/50">
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-sky-400 to-blue-600 text-white shadow-xs">
                     <History className="w-4 h-4 text-white stroke-[2.5]" />
                   </span>
                   <span className="flex-1">{getTranslation(selectedLang, 'nav_history')}</span>
-                  {activeTab === 'history' && <span className="w-2 h-2 rounded-full bg-sky-400 animate-pulse shadow-sm shadow-sky-400/50"></span>}
+                  {activeTab === 'history' && <span className="w-2 h-2 rounded-full bg-sky-500 animate-pulse shadow-xs"></span>}
                 </button>
 
-                {/* 6. दिशा-निर्देश व मदद (Guidelines & Help) */}
+                {/* 6. Help & Guide */}
                 <button
                   id="menu-item-help"
                   onClick={() => {
@@ -2098,46 +2373,46 @@ const searchDistrict = profile?.district || "New Delhi";
                   }}
                   className={`w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
                     activeTab === 'help'
-                      ? 'bg-orange-950/70 text-orange-100 font-black border border-orange-500/50 shadow-inner ring-1 ring-orange-500/30'
-                      : 'text-slate-100 hover:bg-[#0f3b2c] hover:text-white'
+                      ? 'bg-emerald-50 text-emerald-950 font-black border border-emerald-300 ring-1 ring-emerald-400/20 shadow-xs'
+                      : 'text-slate-700 hover:bg-emerald-50/70 hover:text-emerald-950'
                   }`}
                 >
-                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-orange-400 to-amber-500 text-white shadow-md shadow-orange-950/50">
+                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-emerald-500 to-teal-600 text-white shadow-xs">
                     <HelpCircle className="w-4 h-4 text-white stroke-[2.5]" />
                   </span>
-                  <span className="flex-1">{getTranslation(selectedLang, 'nav_help')}</span>
-                  {activeTab === 'help' && <span className="w-2 h-2 rounded-full bg-orange-400 animate-pulse shadow-sm shadow-orange-400/50"></span>}
+                  <span className="flex-1">Help & Guide</span>
+                  {activeTab === 'help' && <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shadow-xs"></span>}
                 </button>
 
                 {/* Subtle Divider */}
                 <div className="py-2">
-                  <div className="border-t border-[#0e3a2b]"></div>
+                  <div className="border-t border-slate-200"></div>
                 </div>
 
-                {/* 7. भाषा बदलें (Language Selection Accordion) */}
+                {/* 6. भाषा बदलें (Existing Language Selector) */}
                 <div>
                   <button
                     id="menu-item-language"
                     onClick={() => setIsDrawerLangOpen(!isDrawerLangOpen)}
-                    className="w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm text-slate-100 hover:bg-[#0f3b2c] hover:text-white transition-all flex items-center justify-between cursor-pointer"
+                    className="w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm text-slate-700 hover:bg-slate-100 hover:text-slate-900 transition-all flex items-center justify-between cursor-pointer"
                   >
                     <div className="flex items-center gap-3">
-                      <span className="w-8 h-8 rounded-lg bg-[#003d31] text-emerald-300 border border-[#004e3e] flex items-center justify-center shrink-0 shadow-xs">
-                        <Globe className="w-4 h-4 text-emerald-300 stroke-[2.2]" />
+                      <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center shrink-0 shadow-xs">
+                        <Globe className="w-4 h-4 text-emerald-700 stroke-[2.2]" />
                       </span>
                       <div>
-                        <div className="font-bold text-white">भाषा बदलें (Language)</div>
-                        <div className="text-xs text-emerald-300 font-semibold">
+                        <div className="font-bold text-slate-900">भाषा बदलें (Select Language)</div>
+                        <div className="text-xs text-emerald-700 font-semibold">
                           {SUPPORTED_LANGUAGES.find(l => l.code === selectedLang)?.name || 'हिन्दी'} ({SUPPORTED_LANGUAGES.find(l => l.code === selectedLang)?.englishName || 'Hindi'})
                         </div>
                       </div>
                     </div>
-                    {isDrawerLangOpen ? <ChevronUp className="w-4 h-4 text-slate-300" /> : <ChevronDown className="w-4 h-4 text-slate-300" />}
+                    {isDrawerLangOpen ? <ChevronUp className="w-4 h-4 text-slate-400" /> : <ChevronDown className="w-4 h-4 text-slate-400" />}
                   </button>
 
                   {/* Language Selection List */}
                   {isDrawerLangOpen && (
-                    <div className="mt-1.5 ml-3 pl-3 border-l-2 border-emerald-500/60 bg-[#051c13] rounded-r-xl p-2 space-y-1 max-h-56 overflow-y-auto ring-1 ring-[#00382d]">
+                    <div className="mt-1.5 ml-3 pl-3 border-l-2 border-emerald-500 bg-slate-50 rounded-r-xl p-2 space-y-1 max-h-56 overflow-y-auto ring-1 ring-slate-200 shadow-inner">
                       {SUPPORTED_LANGUAGES.map((lang) => {
                         const isSelected = selectedLang === lang.code;
                         return (
@@ -2154,15 +2429,15 @@ const searchDistrict = profile?.district || "New Delhi";
                             }}
                             className={`w-full text-left px-3 py-2 rounded-lg text-xs font-bold transition-colors cursor-pointer flex items-center justify-between ${
                               isSelected
-                                ? 'bg-emerald-600/30 text-emerald-200 font-black border border-emerald-500/40'
-                                : 'text-slate-200 hover:bg-[#0f3b2c] hover:text-white'
+                                ? 'bg-emerald-100 text-emerald-950 font-black border border-emerald-300'
+                                : 'text-slate-700 hover:bg-white hover:text-slate-900'
                             }`}
                           >
                             <span className="flex items-center gap-1.5">
                               <span>{lang.name}</span>
                               <span className="text-[11px] text-slate-400 font-normal">({lang.englishName})</span>
                             </span>
-                            {isSelected && <CheckCircle className="w-3.5 h-3.5 text-emerald-400 shrink-0" />}
+                            {isSelected && <CheckCircle className="w-3.5 h-3.5 text-emerald-600 shrink-0" />}
                           </button>
                         );
                       })}
@@ -2170,40 +2445,37 @@ const searchDistrict = profile?.district || "New Delhi";
                   )}
                 </div>
 
-                {/* 8. सेटिंग्स (Settings) */}
+                {/* 7. किसान प्रोफ़ाइल (Kisaan Profile) */}
                 <button
-                  id="menu-item-settings"
+                  id="menu-item-profile"
                   onClick={() => {
                     setIsMenuDrawerOpen(false);
                     setIsProfileModalOpen(true);
                   }}
-                  className="w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm text-slate-100 hover:bg-[#0f3b2c] hover:text-white transition-all flex items-center gap-3 cursor-pointer"
+                  className="w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm text-slate-700 hover:bg-emerald-50/70 hover:text-emerald-950 transition-all flex items-center justify-between cursor-pointer border border-transparent hover:border-emerald-200"
                 >
-                  <span className="w-8 h-8 rounded-lg bg-[#003d31] text-slate-200 border border-[#004e3e] flex items-center justify-center shrink-0 shadow-xs">
-                    <Settings className="w-4 h-4 text-slate-200 stroke-[2.2]" />
+                  <div className="flex items-center gap-3">
+                    <span className="w-8 h-8 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200/80 flex items-center justify-center shrink-0 shadow-xs">
+                      <User className="w-4 h-4 text-emerald-700 stroke-[2.2]" />
+                    </span>
+                    <div>
+                      <div className="font-bold text-slate-900 leading-tight">
+                        Kisaan Profile
+                      </div>
+                      <div className="text-xs text-slate-500 font-medium">
+                        {selectedLang === 'hi' ? 'किसान प्रोफ़ाइल' : (profile.district ? `${profile.district}, ${profile.state}` : 'Farmer Profile')}
+                      </div>
+                    </div>
+                  </div>
+                  <span className="text-[11px] text-emerald-700 font-semibold px-2 py-0.5 rounded-md bg-emerald-50 border border-emerald-200">
+                    {selectedLang === 'hi' ? 'प्रोफ़ाइल' : 'Profile'}
                   </span>
-                  <span className="flex-1 font-bold text-white">सेटिंग्स (Settings & Profile)</span>
                 </button>
-
-                {/* Subtle Divider */}
-                <div className="py-2">
-                  <div className="border-t border-[#0e3a2b]"></div>
-                </div>
-
-                {/* 9. किसान हेल्पलाइन (Helpline) */}
-                <a
-                  id="menu-item-helpline"
-                  href="tel:18001801551"
-                  className="w-full bg-[#FDB813] hover:bg-[#ffc42e] active:scale-95 text-[#002C23] font-black text-sm px-4 py-3 rounded-xl transition-all shadow-lg shadow-black/30 flex items-center justify-center gap-2 cursor-pointer whitespace-nowrap"
-                >
-                  <Phone className="w-4 h-4 fill-current text-[#002C23] shrink-0" />
-                  <span>किसान हेल्पलाइन 1800-180-1551</span>
-                </a>
               </div>
 
               {/* Drawer Footer info */}
-              <div className="p-3 bg-[#041a12] border-t border-[#0e3a2b] text-center">
-                <p className="text-[11px] text-emerald-400/80 font-medium">
+              <div className="p-3 bg-slate-50 border-t border-slate-100 text-center">
+                <p className="text-[11px] text-slate-500 font-medium">
                   AgreNova AI • कृषक हित में जारी
                 </p>
               </div>
@@ -2221,212 +2493,138 @@ const searchDistrict = profile?.district || "New Delhi";
         className="hidden" 
       />
 
-      {/* Main Content Body */}
-      <div className="max-w-6xl mx-auto w-full flex-1 flex flex-col gap-4 md:gap-6 p-3 sm:p-4 md:p-6 min-w-0">
-        {/* Offline & App Notification banner */}
-        {isOffline && (
+      {/* Offline Alert */}
+      {isOffline && (
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-4">
           <div className="bg-amber-500 text-white px-4 py-2.5 rounded-2xl flex items-center justify-between shadow-md text-sm font-semibold animate-pulse">
             <span className="flex items-center gap-2">
               <AlertCircle className="w-5 h-5 shrink-0" />
               <span>{getTranslation(selectedLang, 'offline_mode_alert')}</span>
             </span>
           </div>
-        )}
+        </div>
+      )}
 
-        {/* Dynamic farmer greetings & Local weather strip */}
-        {activeTab === 'home' && (
-          <div className="w-full max-w-4xl mx-auto mb-2">
-            {(() => {
-              const rawMain = (weatherAdvisory?.debugInfo?.condition || '').trim();
-              const rawDesc = (weatherAdvisory?.debugInfo?.description || '').toLowerCase().trim();
-              const rawCond = (weatherAdvisory?.condition || '').toLowerCase().trim();
-              const mainLower = rawMain.toLowerCase();
+      {/* SECTION 1 — CINEMATIC AGRICULTURE VIDEO HERO */}
+      {activeTab === 'home' && (
+        <CortevaVideoHero
+          selectedLang={selectedLang}
+          onVoiceClick={openVoiceModal}
+          onCameraClick={openCameraModal}
+          onSubmitQuery={(q) => handleAskQuestion(q)}
+          isVoiceActive={isRecording}
+        />
+      )}
 
-              let weatherIcon = '☀️';
-              if (mainLower === 'thunderstorm' || rawDesc.includes('thunderstorm') || rawCond.includes('thunder') || rawCond.includes('तूफान')) {
-                weatherIcon = '⛈️';
-              } else if (mainLower === 'drizzle' || rawDesc.includes('drizzle')) {
-                weatherIcon = '🌦️';
-              } else if (mainLower === 'rain' || rawDesc.includes('rain') || rawCond.includes('बारिश') || rawCond.includes('वर्षा')) {
-                weatherIcon = '🌧️';
-              } else if (mainLower === 'clouds' || rawDesc.includes('cloud') || rawCond.includes('बादल')) {
-                if (rawDesc.includes('broken') || rawDesc.includes('overcast') || rawCond.includes('घने')) {
-                  weatherIcon = '☁️';
-                } else {
-                  weatherIcon = '⛅';
-                }
-              } else if (mainLower === 'mist' || mainLower === 'fog' || mainLower === 'haze' || mainLower === 'smoke' || rawDesc.includes('mist') || rawDesc.includes('fog') || rawDesc.includes('haze') || rawDesc.includes('smoke') || rawCond.includes('धुंध') || rawCond.includes('कोहरा')) {
-                weatherIcon = '🌫️';
-              } else {
-                weatherIcon = '☀️';
-              }
-
-              const cleanTemp = (weatherAdvisory?.temp || '35°C').replace(/[\s.]*$/, '').trim();
-              const cleanCond = (weatherAdvisory?.condition || 'साफ़ और धूप भरा मौसम').replace(/^[.\s•]+/, '').trim();
-              const displayLoc = formatLocationDisplay(profile.district, profile.state);
-
-              return (
-                <div 
-                  id="weather-emerald-card"
-                  className="bg-gradient-to-r from-[#062a1d] via-[#083624] to-[#0a3d2b] text-white p-4 sm:p-5 md:p-6 rounded-2xl border border-emerald-700/50 relative overflow-hidden flex flex-col justify-between gap-4 transition-all duration-300 shadow-md"
-                >
-                  {/* Automatic Weather Environment Animation Overlay */}
-                  <WeatherEnvironmentAnimation 
-                    conditionMain={weatherAdvisory?.debugInfo?.condition}
-                    conditionDesc={weatherAdvisory?.debugInfo?.description}
-                    conditionHindi={weatherAdvisory?.condition}
-                  />
-
-                  {/* Top Badge Header Row */}
-                  <div className="flex items-center justify-between gap-3 relative z-10 flex-wrap">
-                    <div className="flex items-center gap-2.5 flex-wrap">
-                      <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-950/80 border border-emerald-500/30 text-emerald-300 text-xs font-bold shadow-2xs">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse shrink-0"></span>
-                        <span>लाइव मौसम व कृषि पूर्वानुमान</span>
-                      </div>
-                    </div>
-
-                    {isWeatherLoading && (
-                      <span className="text-[10px] text-emerald-200 bg-white/10 px-2.5 py-0.5 rounded-full flex items-center gap-1.5 font-semibold">
-                        <span className="w-2 h-2 border border-white border-t-transparent rounded-full animate-spin"></span>
-                        अपडेट हो रहा है...
-                      </span>
-                    )}
-                  </div>
-
-                  {isWeatherLoading && !weatherAdvisory ? (
-                    <div className="flex items-center gap-3 py-6 px-2 text-emerald-100 font-semibold z-10 min-h-[100px]">
-                      <div className="w-6 h-6 border-2 border-white border-t-transparent rounded-full animate-spin shrink-0"></div>
-                      <span className="text-sm font-bold">मौसम का डेटा लोड हो रहा है...</span>
-                    </div>
-                  ) : weatherAdvisory ? (
-                    <div className="z-10 flex flex-col gap-4">
-                      {/* Main Center Area: Left Core Weather Data, Right Metrics & Action Buttons */}
-                      <div className="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
-                        
-                        {/* Left Side: Glowing Icon, Large Temp & Condition, Location, OpenWeather API tag */}
-                        <div className="flex items-center gap-3.5">
-                          {/* Glowing Weather Icon */}
-                          <div className="w-13 h-13 rounded-xl bg-white/10 border border-emerald-400/25 flex items-center justify-center text-3xl shrink-0 shadow-inner">
-                            {weatherIcon}
-                          </div>
-
-                          <div>
-                            {/* Large Active Temperature & Condition */}
-                            <div className="flex items-baseline gap-2 flex-wrap sm:flex-nowrap">
-                              <span className="text-3xl sm:text-4xl font-black text-white tracking-tight leading-none drop-shadow-xs">
-                                {cleanTemp}
-                              </span>
-                              <span className="text-base sm:text-lg font-extrabold text-emerald-100 whitespace-nowrap leading-none flex items-center gap-1.5">
-                                <span>•</span>
-                                <span>{cleanCond}</span>
-                              </span>
-                            </div>
-
-                            {/* Location & Metadata Attribution */}
-                            <div className="flex items-center gap-2 mt-1.5 flex-wrap">
-                              <p className="text-xs text-emerald-200 font-semibold flex items-center gap-1">
-                                📍 {displayLoc} (अनुमानित)
-                              </p>
-                              <span className="text-emerald-500/60 hidden sm:inline">•</span>
-                              <span className="text-[11px] text-emerald-300/80 font-medium">
-                                🌐 {!weatherIsCached ? 'लाइव मौसम - OpenWeather API • LIVE DATA' : 'कैश्ड मौसम डेटा'}
-                              </span>
-                            </div>
-                          </div>
-                        </div>
-
-                        {/* Right Side: Vertical Divider, Micro-Metrics & Circular Action Buttons */}
-                        <div className="flex items-center justify-between md:justify-end gap-5 w-full md:w-auto md:border-l md:border-emerald-700/50 md:pl-6 pt-2 md:pt-0 border-t md:border-t-0 border-emerald-800/40">
-                          {/* Live Metrics Row */}
-                          <div className="flex items-center gap-5 sm:gap-6 text-center">
-                            <div className="flex flex-col items-center">
-                              <span className="text-[11px] text-emerald-300 font-medium flex items-center gap-1">💧 नमी</span>
-                              <strong className="text-xs sm:text-sm font-black text-white mt-0.5">{weatherAdvisory.humidity || '63%'}</strong>
-                            </div>
-                            <div className="flex flex-col items-center">
-                              <span className="text-[11px] text-emerald-300 font-medium flex items-center gap-1">💨 हवा</span>
-                              <strong className="text-xs sm:text-sm font-black text-white mt-0.5">{weatherAdvisory.windSpeed || '3.09 m/s'}</strong>
-                            </div>
-                            <div className="flex flex-col items-center">
-                              <span className="text-[11px] text-emerald-300 font-medium flex items-center gap-1">☁️ बादल</span>
-                              <strong className="text-xs sm:text-sm font-black text-white mt-0.5">{weatherAdvisory.clouds || '65%'}</strong>
-                            </div>
-                          </div>
-
-                          {/* Floating Circular Action Buttons */}
-                          <div className="flex items-center gap-2 shrink-0">
-                            <button
-                              type="button"
-                              id="btn-share-weather"
-                              onClick={handleShareWeather}
-                              title="मौसम साझा करें"
-                              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-all active:scale-95 cursor-pointer shrink-0 shadow-xs"
-                            >
-                              <Share2 className="w-4 h-4 text-emerald-200" />
-                            </button>
-                            <button
-                              type="button"
-                              id="btn-refresh-weather"
-                              onClick={handleRefreshWeather}
-                              title="मौसम रिफ्रेश करें"
-                              className="w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 border border-white/15 flex items-center justify-center text-white transition-all active:scale-95 cursor-pointer shrink-0 shadow-xs"
-                            >
-                              <RefreshCw className={`w-4 h-4 text-emerald-200 ${isWeatherLoading ? 'animate-spin' : ''}`} />
-                            </button>
-                          </div>
-                        </div>
-
-                      </div>
-
-                      {/* Integrated Bottom Advisory Strip */}
-                      <div className="bg-[#031d14]/90 border border-emerald-800/60 rounded-xl px-4 py-2.5 flex items-center gap-2 text-xs text-white">
-                        <Sparkles className="w-4 h-4 text-amber-400 shrink-0" />
-                        <span className="text-amber-300 font-bold shrink-0">🌾 मृदा / छिड़काव सलाह:</span>
-                        <p className="text-emerald-50 font-medium leading-relaxed">
-                          {(() => {
-                            let adv = weatherAdvisory.advisory || 'आज का मौसम अनुकूल है। फसल छिड़काव, खाद प्रबंधन व अन्य कृषि कार्य किए जा सकते हैं।';
-                            adv = adv.replace(/\s*\([^)]*आर्द्रता:[^)]*\)/g, '').replace(/\s*\([^)]*Humidity:[^)]*\)/g, '').trim();
-                            if (!adv || adv.includes('आर्द्रता:') || adv.includes('Humidity:')) {
-                              adv = weatherAdvisory.isSpraySafe
-                                ? 'आज का मौसम फसल छिड़काव और कृषि कार्यों के लिए अनुकूल है।'
-                                : 'मौसम में बदलाव संभव है। कीटनाशक छिड़काव व सिंचाई ध्यानपूर्वक करें।';
-                            }
-                            return adv;
-                          })()}
-                        </p>
-                      </div>
-                    </div>
-                  ) : (
-                    <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 py-6 px-2 text-emerald-100 z-10 min-h-[100px]">
-                      <div className="flex items-center gap-3">
-                        <AlertCircle className="w-6 h-6 text-amber-300 shrink-0" />
-                        <div>
-                          <h4 className="text-sm font-bold text-white">{getTranslation(selectedLang, 'weather_unavailable_title')}</h4>
-                          <p className="text-xs text-emerald-200 mt-0.5">{getTranslation(selectedLang, 'weather_unavailable_sub')}</p>
-                        </div>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={handleRefreshWeather}
-                        className="bg-emerald-600 hover:bg-emerald-500 active:bg-emerald-700 text-white px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer shadow-xs"
-                      >
-                        <RefreshCw className="w-3.5 h-3.5" />
-                        <span>{getTranslation(selectedLang, 'retry_weather_btn')}</span>
-                      </button>
-                    </div>
-                  )}
+      {/* Active Diagnostics / Query Results Display (Prominent on Home when active) */}
+      {activeTab === 'home' && (activeResult || isAnalyzingPhoto || isAskingQuestion || photoError) && (
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
+          <div className="bg-white rounded-2xl border border-slate-200/90 shadow-md p-6">
+            {/* Loading State */}
+            {(isAnalyzingPhoto || isAskingQuestion) && (
+              <div className="flex flex-col items-center justify-center text-center py-12 gap-4">
+                <RefreshCw className="w-10 h-10 text-emerald-600 animate-spin" />
+                <div>
+                  <h4 className="font-extrabold text-lg text-slate-900">{getTranslation(selectedLang, 'scientists_analyzing')}</h4>
+                  <p className="text-sm text-slate-500 mt-1 max-w-xs mx-auto leading-relaxed">
+                    {isAnalyzingPhoto ? getTranslation(selectedLang, 'photo_analyzing_desc') : getTranslation(selectedLang, 'question_analyzing_desc')}
+                  </p>
                 </div>
-              );
-            })()}
+              </div>
+            )}
+
+            {/* Diagnostics Report Card */}
+            {!isAnalyzingPhoto && !isAskingQuestion && activeResult && (
+              <CropAnalysisResultCard
+                result={activeResult}
+                selectedLang={selectedLang}
+                imageUrl={selectedImage}
+                cropName={profile.crop ? (mspRates[profile.crop]?.name || profile.crop) : undefined}
+                onPrint={handlePrintReport}
+                getWhatsAppLink={getWhatsAppLink}
+                translatedAdvice={translatedMessages['active-advice']}
+                isTranslatingAdvice={isTranslatingKey === 'active-advice'}
+                onTranslateAdvice={() => handleTranslateResponse('active-advice', activeResult.advice)}
+                onScanAnother={() => {
+                  setSelectedImage(null);
+                  if (fileInputRef.current) fileInputRef.current.value = '';
+                }}
+                idPrefix="active-advice"
+              />
+            )}
+
+            {/* Error State */}
+            {photoError && !isAnalyzingPhoto && (
+              <div className="bg-rose-50 border border-rose-200 p-5 rounded-2xl flex flex-col gap-3">
+                <div className="flex items-start gap-3">
+                  <AlertCircle className="w-5 h-5 text-rose-600 shrink-0 mt-0.5" />
+                  <div className="flex-1 text-xs">
+                    <h4 className="font-extrabold text-rose-950 text-sm">
+                      {getTranslation(selectedLang, 'photo_interrupted_title')}
+                    </h4>
+                    <p className="text-rose-800 mt-1 leading-relaxed font-medium">{photoError}</p>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setPhotoError('');
+                    triggerFileSelect();
+                  }}
+                  className="self-start bg-rose-700 hover:bg-rose-800 text-white px-4 py-2 rounded-xl font-black text-xs transition-all cursor-pointer shadow-xs inline-flex items-center gap-1.5"
+                >
+                  <RefreshCw className="w-3.5 h-3.5" />
+                  <span>{getTranslation(selectedLang, 'retry_photo_upload_btn')}</span>
+                </button>
+              </div>
+            )}
           </div>
-        )}
+        </div>
+      )}
+
+      {/* SECTION 2 — EXACTLY THREE MAIN FEATURE CARDS (Voice, Crop Photo, Live Weather) */}
+      {activeTab === 'home' && (
+        <CortevaThreeFeatureCards
+          selectedLang={selectedLang}
+          onVoiceClick={openVoiceModal}
+          onCameraClick={openCameraModal}
+          weatherAdvisory={weatherAdvisory}
+          isWeatherLoading={isWeatherLoading}
+          weatherIsCached={weatherIsCached}
+          profile={profile}
+          onRefreshWeather={handleRefreshWeather}
+          onShareWeather={handleShareWeather}
+          onOpenProfile={() => setIsProfileModalOpen(true)}
+          formatLocationDisplay={formatLocationDisplay}
+          isVoiceActive={isRecording}
+        />
+      )}
+
+      {/* Dedicated Tab Breadcrumb when navigating away from Home */}
+      {activeTab !== 'home' && (
+        <div className="max-w-7xl mx-auto w-full px-4 sm:px-6 lg:px-8 pt-6 pb-2">
+          <button
+            onClick={() => {
+              setActiveTab('home');
+              setSelectedPastReport(null);
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+            className="inline-flex items-center gap-2 text-xs font-bold text-emerald-800 bg-white hover:bg-emerald-50 border border-slate-200 hover:border-emerald-300 px-3.5 py-2 rounded-xl transition shadow-2xs cursor-pointer"
+          >
+            <ArrowRight className="w-4 h-4 rotate-180" />
+            <span>{selectedLang === 'hi' ? '← मुख्य पृष्ठ पर वापस जाएं' : '← Back to Home Overview'}</span>
+          </button>
+        </div>
+      )}
+
+      {/* Main Content Body */}
+      <div className="w-full flex-1 flex flex-col min-w-0">
 
         {/* Tab Content Panels */}
         <AnimatePresence mode="wait">
           
-          {/* TAB 1: HOME PANEL */}
-          {(activeTab === 'home' || activeTab === 'chat' || activeTab === 'diagnosis') && (
+          {/* DEDICATED CHAT & DIAGNOSIS PANELS */}
+          {(activeTab === 'chat' || activeTab === 'diagnosis') && (
             <motion.div 
               key="tab-home-pane"
               initial={{ opacity: 0, y: 15 }}
@@ -4175,7 +4373,21 @@ const searchDistrict = profile?.district || "New Delhi";
                         <Bot className="w-4 h-4 text-emerald-700" />
                       </div>
                       <span className="leading-relaxed font-semibold text-emerald-900">
-                        नमस्ते किसान भाई! फसल, मौसम, कीट या खाद से संबंधित कोई भी सवाल पूछें।
+                        {(() => {
+                          const welcomeMap: Record<string, string> = {
+                            hi: 'नमस्ते किसान भाई! फसल, मौसम, कीट या खाद से संबंधित कोई भी सवाल पूछें।',
+                            en: 'Hello farmer friend! Ask any question regarding crops, weather, pests, or fertilizers.',
+                            mr: 'नमस्कार शेतकरी बांधव! पीक, हवामान, कीड किंवा खतांशी संबंधित कोणताही प्रश्न विचारा.',
+                            gu: 'નમસ્તે ખેડૂત મિત્ર! પાક, હવામાન, જીવાત કે ખાતર સંબંધિત કોઈપણ પ્રશ્ન પૂછો.',
+                            pa: 'ਸਤਿ ਸ੍ਰੀ ਅਕਾਲ ਕਿਸਾਨ ਵੀਰੋ! ਫ਼ਸਲ, ਮੌਸਮ, ਕੀੜੇ ਜਾਂ ਖਾਦ ਬਾਰੇ ਕੋਈ ਵੀ ਸਵਾਲ ਪੁੱਛੋ।',
+                            bn: 'নমস্কার কৃষক ভাই! ফসল, আবহাওয়া, কীটপতঙ্গ বা সার সংক্রান্ত যে কোনো প্রশ্ন জিজ্ঞাসা করুন।',
+                            ta: 'வணக்கம் விவசாய நண்பரே! பயிர், வானிலை, பூச்சி அல்லது உரம் தொடர்பான எந்த கேள்வியையும் கேளுங்கள்.',
+                            te: 'నమస్కారం రైతు మిత్రమా! పంట, వాతావరణం, తెగుళ్లు లేదా ఎరువులకు సంబంధించి ఏదైనా ప్రశ్న అడగండి.',
+                            kn: 'ನಮಸ್ಕಾರ ರೈತ ಮಿತ್ರರೇ! ಬೆಳೆ, ಹವಾಮಾನ, ಕೀಟ ಅಥವಾ ರಸಗೊಬ್ಬರಕ್ಕೆ ಸಂಬಂಧಿಸಿದ ಯಾವುದೇ ಪ್ರಶ್ನೆಯನ್ನು ಕೇಳಿ.',
+                            ml: 'നമസ്കാരം കർഷക സുഹൃത്തേ! വിളകൾ, കാലാവസ്ഥ, കീടങ്ങൾ അല്ലെങ്കിൽ വളങ്ങൾ സംബന്ധിച്ച ഏത് ചോദ്യവും ചോദിക്കുക.'
+                          };
+                          return welcomeMap[selectedLang] || welcomeMap.en;
+                        })()}
                       </span>
                     </div>
                   </div>
@@ -4264,7 +4476,23 @@ const searchDistrict = profile?.district || "New Delhi";
                     {isAskingQuestion && (
                       <div className="self-start flex items-center gap-2 p-3 bg-white rounded-2xl border border-slate-200/80 shadow-2xs text-xs text-slate-600 animate-pulse my-1">
                         <Bot className="w-4 h-4 text-emerald-600 shrink-0" />
-                        <span>उत्तर तैयार किया जा रहा है...</span>
+                        <span>
+                          {(() => {
+                            const loadingMap: Record<string, string> = {
+                              hi: 'उत्तर तैयार किया जा रहा है...',
+                              en: 'Preparing advisory...',
+                              mr: 'उत्तर तयार केले जात आहे...',
+                              gu: 'જવાબ તૈયાર થઈ રહ્યો છે...',
+                              pa: 'ਜਵਾਬ ਤਿਆਰ ਕੀਤਾ ਜਾ ਰਿਹਾ ਹੈ...',
+                              bn: 'উত্তর প্রস্তুত করা হচ্ছে...',
+                              ta: 'பதில் தயாராகி வருகிறது...',
+                              te: 'సమాధానం సిద్ధం చేయబడుతోంది...',
+                              kn: 'ಉತ್ತರವನ್ನು ಸಿದ್ಧಪಡಿಸಲಾಗುತ್ತಿದೆ...',
+                              ml: 'ഉത്തരം തയ്യാറാക്കുന്നു...'
+                            };
+                            return loadingMap[selectedLang] || loadingMap.en;
+                          })()}
+                        </span>
                       </div>
                     )}
 
@@ -4320,39 +4548,6 @@ const searchDistrict = profile?.district || "New Delhi";
 
                 {/* RIGHT / QUICK INFO SECTION */}
                 <div className="w-full md:w-[280px] lg:w-[300px] shrink-0 bg-slate-50/90 p-3.5 flex flex-col gap-3 overflow-y-auto min-h-0">
-                  
-                  {/* Active Context Card */}
-                  <div className="bg-emerald-900/5 border border-emerald-600/20 rounded-2xl p-3 shadow-2xs flex flex-col gap-1.5 text-xs">
-                    <div className="flex items-center justify-between text-emerald-950 font-black text-[11px] uppercase tracking-wider">
-                      <span className="flex items-center gap-1">
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-700" />
-                        <span>सक्रिय कृषि संदर्भ (Active Context)</span>
-                      </span>
-                    </div>
-                    <div className="space-y-1 text-slate-700 font-medium text-[11px] pt-1">
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-500">📍 क्षेत्र:</span>
-                        <span className="font-bold text-slate-900">{profile.district || 'जिला'}, {profile.state || 'राज्य'}</span>
-                      </div>
-                      <div className="flex items-center justify-between">
-                        <span className="text-slate-500">🌾 फसल:</span>
-                        <span className="font-bold text-slate-900">{profile.crop?.split('(')[0]?.trim() || 'फसल'} ({profile.landSize || '2'} एकड़)</span>
-                      </div>
-                      {liveWeather && (
-                        <div className="flex items-center justify-between">
-                          <span className="text-slate-500">🌤️ मौसम:</span>
-                          <span className="font-bold text-slate-900">{liveWeather.temp} • {liveWeather.isSpraySafe !== false ? 'छिड़काव सुरक्षित' : 'छिड़काव टालें'}</span>
-                        </div>
-                      )}
-                      {activeResult?.disease && (
-                        <div className="flex items-center justify-between border-t border-emerald-600/10 pt-1 text-amber-900">
-                          <span className="text-slate-500">🔍 हालिया जांच:</span>
-                          <span className="font-bold truncate max-w-[120px]" title={activeResult.disease}>{activeResult.disease}</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
                   {/* FAQ Suggestion Prompts Section */}
                   <div className="bg-white p-3 rounded-2xl border border-slate-200/80 shadow-2xs flex flex-col gap-2">
                     <span className="text-[11px] text-slate-500 font-extrabold uppercase tracking-wider block">
@@ -4373,10 +4568,11 @@ const searchDistrict = profile?.district || "New Delhi";
                           suggestions.push(`आज के मौसम (${liveWeather.temp}) में छिड़काव सलाह`);
                         }
                         const defaults = [
-                          "धान की पत्तियां पीली क्यों हो रही हैं?",
-                          "गेहूं के पीला रतुआ का इलाज बताएं",
-                          "कपास में गुलाबी सुंडी नियंत्रण"
-                        ];
+                          getTranslation(selectedLang, 'voice_example_1'),
+                          getTranslation(selectedLang, 'voice_example_2'),
+                          getTranslation(selectedLang, 'voice_example_3'),
+                          getTranslation(selectedLang, 'voice_example_4')
+                        ].filter(Boolean);
                         for (const d of defaults) {
                           if (suggestions.length < 4 && !suggestions.includes(d)) {
                             suggestions.push(d);
@@ -4427,15 +4623,16 @@ const searchDistrict = profile?.district || "New Delhi";
           )}
         </AnimatePresence>
 
-        {/* Footer section */}
-        <footer className="text-center py-6 border-t border-slate-200/80 mt-8 flex flex-col sm:flex-row justify-between items-center gap-3">
-          <p className="text-xs text-slate-500 font-medium">© {selectedLang === 'hi' ? toHindiDigits(new Date().getFullYear()) : new Date().getFullYear()} AgreNova AI • {getTranslation(selectedLang, 'footer_tagline')}</p>
-          <div className="flex gap-4 text-xs font-bold text-slate-500">
-            <span className="hover:text-emerald-700 transition-colors cursor-pointer" onClick={() => setActiveTab('help')}>{getTranslation(selectedLang, 'user_guidelines_link')}</span>
-            <span>•</span>
-            <span className="hover:text-emerald-700 transition-colors cursor-pointer" onClick={() => setIsProfileModalOpen(true)}>{getTranslation(selectedLang, 'change_profile_link')}</span>
-          </div>
-        </footer>
+        {/* SECTION 3: ABOUT / COMPANY INFORMATION / FOOTER (Corteva Style) */}
+        <CortevaCompanySection
+          selectedLang={selectedLang}
+          onNavigateTab={(tab) => {
+            setActiveTab(tab);
+            setSelectedPastReport(null);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onOpenProfile={() => setIsProfileModalOpen(true)}
+        />
 
         {/* Voice Assistant Overlay Modal */}
         <VoiceAssistantModal

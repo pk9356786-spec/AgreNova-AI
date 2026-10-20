@@ -1,6 +1,6 @@
 {
   "name": "AgreNova AI",
-  "description": "भारतीय किसानों के लिए एक मोबाइल-अनुकूल वेब ऐप जो फसल रोगों की पहचान और फसलों के न्यूनतम समर्थन मूल्य (MSP) की जानकारी देता है।",
+  "description": "Data and AI Foundation for Enterprise Agriculture Transformation. Combining AGRIVI-grade enterprise rigor with zero-friction AI agronomy and diagnostics for Indian agriculture.",
   "requestFramePermissions": [
     "microphone",
     "camera"

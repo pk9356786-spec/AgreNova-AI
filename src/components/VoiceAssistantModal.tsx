@@ -76,17 +76,17 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = React.mem
           }}
           className="bg-white w-full max-w-lg overflow-hidden border border-slate-200/90 flex flex-col my-auto"
         >
-          {/* 1. Header Bar: Solid Gradient Green */}
-          <div className="bg-[#064e3b] bg-gradient-to-r from-[#064e3b] via-[#047857] to-[#065f46] text-white px-5 py-4 flex items-center justify-between shadow-xs">
+          {/* 1. Header Bar: Solid Deep Emerald Green */}
+          <div className="bg-[#065F46] text-white px-5 py-4 flex items-center justify-between shadow-xs">
             <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur-md flex items-center justify-center text-white border border-white/25 shadow-inner shrink-0">
+              <div className="w-10 h-10 rounded-xl bg-white/15 backdrop-blur-md flex items-center justify-center text-white border border-white/20 shadow-inner shrink-0">
                 <Mic className="w-5 h-5" />
               </div>
               <div>
                 <h3 className="text-base sm:text-lg font-black text-white leading-tight flex items-center gap-2">
                   <span>{getTranslation(selectedLang, 'voice_assistant_modal_title')}</span>
                 </h3>
-                <p className="text-xs text-emerald-100/90 font-medium mt-0.5">
+                <p className="text-xs text-emerald-100 font-medium mt-0.5">
                   {getTranslation(selectedLang, 'voice_assistant_modal_sub')}
                 </p>
               </div>
@@ -103,16 +103,16 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = React.mem
           </div>
 
           {/* 2. Modal Body */}
-          <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-5 bg-slate-50/60 max-h-[calc(90vh-80px)] sm:max-h-[80vh] overflow-y-auto">
+          <div className="p-4 sm:p-6 flex flex-col gap-4 sm:gap-5 bg-[#F8FAFC] max-h-[calc(90vh-80px)] sm:max-h-[80vh] overflow-y-auto">
             
             {/* Step Hint Banner */}
-            <div className="bg-emerald-100/80 border border-emerald-300/80 rounded-xl px-3 py-2 text-[11px] sm:text-xs font-bold text-emerald-950 text-center flex items-center justify-center gap-1.5 shadow-2xs">
-              <span className="text-emerald-700">💡</span>
+            <div className="bg-emerald-50 border border-emerald-200 rounded-xl px-3 py-2 text-[11px] sm:text-xs font-bold text-[#065F46] text-center flex items-center justify-center gap-1.5 shadow-2xs">
+              <span className="text-[#065F46]">💡</span>
               <span className="leading-snug">{getTranslation(selectedLang, 'voice_step_hint')}</span>
             </div>
 
             {/* 3. Core Voice Pulse & Dynamic Equalizer Section */}
-            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200/90 shadow-2xs flex flex-col items-center justify-center text-center">
+            <div className="bg-white rounded-2xl p-4 sm:p-5 border border-slate-200 shadow-sm flex flex-col items-center justify-center text-center">
               
               {/* Mic Icon with Concentric Waves */}
               <div className="relative flex items-center justify-center mb-3">
@@ -127,18 +127,18 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = React.mem
                   type="button"
                   onClick={onToggleRecording}
                   aria-label={isRecording ? getTranslation(selectedLang, 'voice_mic_stop') : getTranslation(selectedLang, 'voice_mic_start')}
-                  className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center text-white transition-all shadow-lg active:scale-95 cursor-pointer ${
+                  className={`relative z-10 w-20 h-20 rounded-full flex items-center justify-center text-white transition-all shadow-md active:scale-95 cursor-pointer ${
                     isRecording 
-                      ? 'bg-gradient-to-br from-rose-600 via-rose-700 to-rose-800 shadow-rose-600/40 ring-4 ring-rose-300/70 scale-105' 
+                      ? 'bg-rose-600 shadow-rose-600/40 ring-4 ring-rose-300 scale-105' 
                       : hasCapturedText 
-                      ? 'bg-gradient-to-br from-emerald-600 to-teal-700 shadow-emerald-700/30 hover:scale-105 ring-4 ring-emerald-200/60'
-                      : 'bg-gradient-to-br from-emerald-700 to-[#064e3b] shadow-emerald-950/30 hover:scale-105'
+                      ? 'bg-[#065F46] shadow-emerald-900/30 hover:scale-105 ring-4 ring-emerald-200'
+                      : 'bg-[#065F46] shadow-emerald-950/30 hover:bg-[#044e3a] hover:scale-105'
                   }`}
                 >
                   {isRecording ? (
                     <MicOff className="w-9 h-9 text-white animate-pulse" />
                   ) : (
-                    <Mic className="w-9 h-9 text-emerald-100" />
+                    <Mic className="w-9 h-9 text-white" />
                   )}
                 </button>
               </div>
@@ -315,7 +315,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = React.mem
                 id="btn-voice-modal-cancel"
                 type="button"
                 onClick={onClose}
-                className="flex-1 bg-white hover:bg-slate-100 text-slate-700 border border-slate-300 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-colors cursor-pointer min-h-[44px] text-center"
+                className="flex-1 bg-white hover:bg-slate-100 text-[#0F172A] border border-slate-300 py-2.5 px-4 rounded-xl font-bold text-xs sm:text-sm transition-colors cursor-pointer min-h-[44px] text-center"
               >
                 {getTranslation(selectedLang, 'voice_cancel_btn')}
               </button>
@@ -324,7 +324,7 @@ export const VoiceAssistantModal: React.FC<VoiceAssistantModalProps> = React.mem
                 type="button"
                 onClick={onSubmit}
                 disabled={!spokenQueryText.trim()}
-                className="flex-1 bg-[#047857] hover:bg-[#065f46] disabled:bg-slate-200 disabled:text-slate-400 text-white py-2.5 px-4 rounded-xl font-black text-xs sm:text-sm shadow-md transition-all active:scale-95 cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
+                className="flex-1 bg-[#065F46] hover:bg-[#044e3a] disabled:bg-slate-200 disabled:text-slate-400 text-white py-2.5 px-4 rounded-xl font-black text-xs sm:text-sm shadow-sm transition-all active:scale-95 cursor-pointer min-h-[44px] flex items-center justify-center gap-2"
               >
                 <Send className="w-4 h-4 shrink-0" />
                 <span className="truncate">{getTranslation(selectedLang, 'voice_submit_btn')}</span>

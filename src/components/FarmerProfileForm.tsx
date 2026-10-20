@@ -186,17 +186,17 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
     <form onSubmit={handleSubmit} className="flex flex-col gap-4 text-xs">
       
       {/* Location Auto-Detect Button */}
-      <div className="bg-emerald-50/70 p-3 rounded-2xl border border-emerald-200/80 flex flex-col gap-2">
+      <div className="bg-[#F8FAFC] p-3 rounded-2xl border border-slate-200 flex flex-col gap-2">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
           <div className="flex items-center gap-2">
-            <Navigation className="w-4 h-4 text-emerald-700 shrink-0" />
-            <span className="font-extrabold text-emerald-950 text-xs">ऑटो स्थान खोज (GPS Auto-Location)</span>
+            <Navigation className="w-4 h-4 text-[#065F46] shrink-0" />
+            <span className="font-extrabold text-[#0F172A] text-xs">ऑटो स्थान खोज (GPS Auto-Location)</span>
           </div>
           <button
             type="button"
             onClick={handleDetectLocation}
             disabled={isDetecting}
-            className="inline-flex items-center justify-center gap-1.5 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white px-3 py-2 sm:py-1.5 rounded-xl font-bold transition-all cursor-pointer shadow-xs disabled:opacity-60 text-xs min-h-[38px] sm:min-h-0"
+            className="inline-flex items-center justify-center gap-1.5 bg-[#065F46] hover:bg-[#044e3a] active:bg-[#033b2c] text-white px-3 py-2 sm:py-1.5 rounded-xl font-bold transition-all cursor-pointer shadow-xs disabled:opacity-60 text-xs min-h-[38px] sm:min-h-0"
           >
             {isDetecting ? (
               <>
@@ -215,13 +215,13 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
         {locationStatus && (
           <div className={`p-2 rounded-xl text-[11px] font-semibold flex items-center gap-1.5 mt-0.5 border ${
             locationStatusType === 'success'
-              ? 'bg-emerald-100/70 border-emerald-300 text-emerald-950'
+              ? 'bg-emerald-50 border-emerald-300 text-[#065F46]'
               : locationStatusType === 'error'
               ? 'bg-amber-50 border-amber-300 text-amber-950'
-              : 'bg-emerald-50 border-emerald-200 text-emerald-900'
+              : 'bg-slate-50 border-slate-200 text-slate-800'
           }`}>
             {locationStatusType === 'success' ? (
-              <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+              <CheckCircle2 className="w-3.5 h-3.5 text-[#065F46] shrink-0" />
             ) : (
               <AlertCircle className="w-3.5 h-3.5 text-amber-600 shrink-0" />
             )}
@@ -232,7 +232,7 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
 
       {/* Name Input */}
       <div>
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
           {getTranslation(selectedLang, 'farmer_full_name')}
         </label>
         <input 
@@ -240,20 +240,20 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
           value={name}
           onChange={(e) => setName(e.target.value)}
           placeholder="जैसे: रमेश यादव / Ramesh Kumar"
-          className="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 text-slate-800 font-medium min-h-[44px]"
+          className="w-full bg-[#F8FAFC] p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#065F46]/20 focus:border-[#065F46] text-[#0F172A] font-medium min-h-[44px]"
         />
       </div>
 
       {/* State & District Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <div>
-          <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+          <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
             {getTranslation(selectedLang, 'state_label')}
           </label>
           <select 
             value={selectedState}
             onChange={(e) => handleStateChange(e.target.value)}
-            className="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 text-slate-800 font-medium cursor-pointer min-h-[44px]"
+            className="w-full bg-[#F8FAFC] p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#065F46]/20 focus:border-[#065F46] text-[#0F172A] font-medium cursor-pointer min-h-[44px]"
           >
             {indianStates.map(state => (
               <option key={state.id} value={state.id}>
@@ -264,7 +264,7 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
         </div>
 
         <div>
-          <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+          <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
             {getTranslation(selectedLang, 'district_label')}
           </label>
           <div className="relative">
@@ -274,7 +274,7 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
               value={district}
               onChange={(e) => setDistrict(e.target.value)}
               placeholder="जिला दर्ज करें या सूची से चुनें"
-              className="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 text-slate-800 font-medium min-h-[44px]"
+              className="w-full bg-[#F8FAFC] p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#065F46]/20 focus:border-[#065F46] text-[#0F172A] font-medium min-h-[44px]"
             />
             <datalist id="profile-district-options">
               {currentDistricts.map(dist => (
@@ -288,9 +288,9 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
       {/* Primary Crop (Searchable Dropdown + Custom Crop) & Land Size Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
         <div className="sm:col-span-2 relative">
-          <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1 flex items-center justify-between">
+          <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1 flex items-center justify-between">
             <span>{getTranslation(selectedLang, 'primary_crop')}</span>
-            <span className="text-[9px] text-emerald-700 font-bold lowercase">खोजें या टाइप करें</span>
+            <span className="text-[9px] text-[#065F46] font-bold lowercase">खोजें या टाइप करें</span>
           </label>
           
           <div className="relative">
@@ -306,7 +306,7 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
                   setIsCropDropdownOpen(true);
                 }}
                 placeholder="फसल खोजें या नई दर्ज करें (उदा: गेहूं, ड्रैगन फ्रूट)"
-                className="w-full bg-slate-50 pl-8 pr-8 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 text-slate-800 font-medium min-h-[44px]"
+                className="w-full bg-[#F8FAFC] pl-8 pr-8 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#065F46]/20 focus:border-[#065F46] text-[#0F172A] font-medium min-h-[44px]"
               />
               {cropSearch ? (
                 <button 
@@ -336,9 +336,9 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
                         setCrop(cropSearch.trim());
                         setIsCropDropdownOpen(false);
                       }}
-                      className="w-full text-left p-2.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-800 font-bold text-xs flex items-center gap-2 cursor-pointer transition-colors min-h-[44px]"
+                      className="w-full text-left p-2.5 bg-emerald-50 hover:bg-emerald-100 text-[#065F46] font-bold text-xs flex items-center gap-2 cursor-pointer transition-colors min-h-[44px]"
                     >
-                      <Sparkles className="w-3.5 h-3.5 text-emerald-600 shrink-0" />
+                      <Sparkles className="w-3.5 h-3.5 text-[#065F46] shrink-0" />
                       <span className="break-words">"+ '{cropSearch}' (कस्टम फसल दर्ज करें)"</span>
                     </button>
                   )}
@@ -356,18 +356,18 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
                             setCropSearch(c.icon ? `${c.icon} ${label}` : label);
                             setIsCropDropdownOpen(false);
                           }}
-                          className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm flex items-center justify-between hover:bg-emerald-50/80 cursor-pointer transition-colors min-h-[44px] ${isSelected ? 'bg-emerald-50 text-emerald-900 font-bold' : 'text-slate-700'}`}
+                          className={`w-full text-left px-3.5 py-2.5 text-xs sm:text-sm flex items-center justify-between hover:bg-slate-50 cursor-pointer transition-colors min-h-[44px] ${isSelected ? 'bg-emerald-50 text-[#065F46] font-bold' : 'text-[#0F172A]'}`}
                         >
                           <div className="flex items-center gap-2.5 min-w-0 flex-1">
                             <span className="text-base leading-none shrink-0 w-5 text-center">{c.icon || '🌱'}</span>
                             <span className="truncate font-medium">{label}</span>
                             {c.category && (
-                              <span className="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-500 font-semibold shrink-0">
+                              <span className="text-[9px] px-2 py-0.5 rounded-full bg-slate-100 text-slate-600 font-semibold shrink-0">
                                 {c.category}
                               </span>
                             )}
                           </div>
-                          {isSelected && <Check className="w-4 h-4 text-emerald-600 shrink-0 ml-2" />}
+                          {isSelected && <Check className="w-4 h-4 text-[#065F46] shrink-0 ml-2" />}
                         </button>
                       );
                     })
@@ -383,7 +383,7 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
         </div>
 
         <div>
-          <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+          <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
             {getTranslation(selectedLang, 'land_size_label')}
           </label>
           <input 
@@ -393,7 +393,7 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
             value={landSize}
             onChange={(e) => setLandSize(e.target.value)}
             placeholder="उदा: 0.5, 1.5, 2.25"
-            className="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-center focus:outline-none focus:ring-2 focus:ring-emerald-600/20 text-slate-800 font-medium min-h-[44px]"
+            className="w-full bg-[#F8FAFC] p-3 rounded-xl border border-slate-200 text-xs sm:text-sm text-center focus:outline-none focus:ring-2 focus:ring-[#065F46]/20 focus:border-[#065F46] text-[#0F172A] font-medium min-h-[44px]"
           />
           <span className="text-[9px] text-slate-400 block mt-0.5 font-normal">
             {getTranslation(selectedLang, 'land_size_hint')}
@@ -403,13 +403,13 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
 
       {/* Soil Type Dropdown & Custom Option */}
       <div>
-        <label className="text-[10px] font-black uppercase tracking-wider text-slate-400 block mb-1">
+        <label className="text-[10px] font-black uppercase tracking-wider text-slate-500 block mb-1">
           {getTranslation(selectedLang, 'soil_type_label')}
         </label>
         <select 
-          value={selectedSoilCategory}
-          onChange={(e) => setSelectedSoilCategory(e.target.value)}
-          className="w-full bg-slate-50 p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 text-slate-800 font-medium cursor-pointer mb-1.5 min-h-[44px]"
+            value={selectedSoilCategory}
+            onChange={(e) => setSelectedSoilCategory(e.target.value)}
+            className="w-full bg-[#F8FAFC] p-3 rounded-xl border border-slate-200 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#065F46]/20 focus:border-[#065F46] text-[#0F172A] font-medium cursor-pointer mb-1.5 min-h-[44px]"
         >
           {soilTypeOptions.map(soil => (
             <option key={soil.id} value={soil.id}>
@@ -424,7 +424,7 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
             value={customSoilInput}
             onChange={(e) => setCustomSoilInput(e.target.value)}
             placeholder="अपनी मिट्टी का नाम लिखें (उदा: कंकरीली रेतीली / Rocky Sandy)"
-            className="w-full bg-emerald-50/50 p-3 rounded-xl border border-emerald-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-emerald-600/20 text-slate-800 font-medium mt-1 min-h-[44px]"
+            className="w-full bg-emerald-50/30 p-3 rounded-xl border border-emerald-300 text-xs sm:text-sm focus:outline-none focus:ring-2 focus:ring-[#065F46]/20 focus:border-[#065F46] text-[#0F172A] font-medium mt-1 min-h-[44px]"
           />
         )}
       </div>
@@ -435,14 +435,15 @@ export const FarmerProfileForm: React.FC<FarmerProfileFormProps> = React.memo(({
           <button 
             type="button"
             onClick={onCancel}
-            className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3.5 rounded-2xl font-black text-xs transition-all cursor-pointer text-center min-h-[44px]"
+            className="flex-1 bg-slate-100 hover:bg-slate-200 text-slate-700 py-3.5 px-4 rounded-xl font-bold text-xs transition-all cursor-pointer text-center min-h-[44px]"
           >
             {getTranslation(selectedLang, 'cancel')}
           </button>
         )}
         <button 
           type="submit"
-          className="flex-1 bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800 text-white py-3.5 rounded-2xl font-black text-xs transition-all cursor-pointer shadow-xs text-center min-h-[44px]"
+          id="btn-save-launch-app"
+          className="flex-1 bg-[#065F46] hover:bg-[#044e3a] active:bg-[#033b2c] text-white py-3.5 px-6 rounded-xl font-black text-sm tracking-wide transition-all cursor-pointer shadow-sm text-center min-h-[44px]"
         >
           {submitLabel || getTranslation(selectedLang, 'save_profile_apply')}
         </button>

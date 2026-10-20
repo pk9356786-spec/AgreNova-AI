@@ -95,11 +95,46 @@ export const VoiceResponsePlayer: React.FC<VoiceResponsePlayerProps> = React.mem
 
     const ttsCode = getTTSLangCode(langCode);
     const voices = window.speechSynthesis.getVoices();
-    const matchedVoice = voices.find(
-      v => v.lang.toLowerCase().startsWith(langCode.toLowerCase()) || 
-           v.lang.toLowerCase().includes(ttsCode.toLowerCase()) ||
-           v.name.toLowerCase().includes(langCode.toLowerCase())
-    );
+    const targetBcp = ttsCode.toLowerCase();
+    const targetBase = langCode.toLowerCase();
+
+    // Map each regional language code to authentic language names & native script indicators
+    const LANG_KEYWORDS: Record<string, string[]> = {
+      hi: ['hindi', 'हिन्दी', 'devanagari'],
+      en: ['english', 'india'],
+      mr: ['marathi', 'मराठी'],
+      gu: ['gujarati', 'ગુજરાતી'],
+      pa: ['punjabi', 'panjabi', 'ਪੰਜਾਬੀ', 'gurmukhi'],
+      bn: ['bengali', 'bangla', 'বাংলা'],
+      ta: ['tamil', 'தமிழ்'],
+      te: ['telugu', 'తెలుగు'],
+      kn: ['kannada', 'ಕನ್ನಡ'],
+      ml: ['malayalam', 'മലയാളം']
+    };
+
+    const targetKeywords = LANG_KEYWORDS[targetBase] || [targetBase];
+
+    // Priority 1: Exact BCP-47 match (e.g. "mr-in" or "mr_in")
+    let matchedVoice = voices.find(v => {
+      const vLang = v.lang.toLowerCase().replace('_', '-');
+      return vLang === targetBcp;
+    });
+
+    // Priority 2: Base language match on v.lang (e.g. "mr" or starts with "mr-")
+    if (!matchedVoice) {
+      matchedVoice = voices.find(v => {
+        const vLang = v.lang.toLowerCase().replace('_', '-');
+        return vLang === targetBase || vLang.startsWith(`${targetBase}-`);
+      });
+    }
+
+    // Priority 3: Specific language keyword in voice name (avoiding accidental substrings)
+    if (!matchedVoice) {
+      matchedVoice = voices.find(v => {
+        const vName = v.name.toLowerCase();
+        return targetKeywords.some(keyword => vName.includes(keyword));
+      });
+    }
 
     const speakNextChunk = () => {
       if (isCancelledRef.current) return;

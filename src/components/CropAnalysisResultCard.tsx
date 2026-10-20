@@ -483,7 +483,7 @@ export const CropAnalysisResultCard: React.FC<CropAnalysisResultCardProps> = Rea
         {onPrint && (
           <button 
             onClick={onPrint}
-            className="flex-1 bg-slate-900 hover:bg-slate-800 text-white p-3.5 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all cursor-pointer shadow-xs text-center min-h-[44px]"
+            className="flex-1 bg-[#065F46] hover:bg-[#044e3a] active:bg-[#033b2c] text-white p-3.5 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all cursor-pointer shadow-xs text-center min-h-[44px]"
           >
             <Printer className="w-4 h-4 shrink-0" />
             <span>{getTranslation(selectedLang, 'download_pdf_report')}</span>
@@ -506,9 +506,9 @@ export const CropAnalysisResultCard: React.FC<CropAnalysisResultCardProps> = Rea
         {onScanAnother && (
           <button
             onClick={onScanAnother}
-            className="bg-emerald-50 hover:bg-emerald-100 text-emerald-900 border border-emerald-200 p-3.5 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all cursor-pointer shadow-2xs text-center min-h-[44px] sm:w-auto px-4"
+            className="bg-[#F8FAFC] hover:bg-slate-100 text-[#065F46] border border-slate-200 p-3.5 rounded-xl flex items-center justify-center gap-2 font-black text-xs transition-all cursor-pointer shadow-2xs text-center min-h-[44px] sm:w-auto px-4"
           >
-            <RefreshCw className="w-4 h-4 text-emerald-700 shrink-0" />
+            <RefreshCw className="w-4 h-4 text-[#065F46] shrink-0" />
             <span>{getTranslation(selectedLang, 'scan_another_btn')}</span>
           </button>
         )}

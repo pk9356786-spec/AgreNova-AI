@@ -4219,6 +4219,10 @@ export function getTranslation(lang: string, key: string, fallback?: string): st
   if (langTable && langTable[key]) {
     return langTable[key];
   }
+  const fallbackTable = UI_TRANSLATIONS['hi'] || UI_TRANSLATIONS['en'];
+  if (fallbackTable && fallbackTable[key]) {
+    return fallbackTable[key];
+  }
   const enTable = UI_TRANSLATIONS['en'];
   if (enTable && enTable[key]) {
     return enTable[key];
@@ -4235,16 +4239,16 @@ export interface SupportedLanguage {
 }
 
 export const SUPPORTED_LANGUAGES: SupportedLanguage[] = [
+  { code: 'hi', name: 'हिन्दी', englishName: 'Hindi', nativeName: 'हिन्दी', bcp47: 'hi-IN' },
   { code: 'en', name: 'English', englishName: 'English', nativeName: 'English', bcp47: 'en-IN' },
-  { code: 'hi', name: 'Hindi', englishName: 'Hindi', nativeName: 'हिन्दी', bcp47: 'hi-IN' },
-  { code: 'mr', name: 'Marathi', englishName: 'Marathi', nativeName: 'मराठी', bcp47: 'mr-IN' },
-  { code: 'gu', name: 'Gujarati', englishName: 'Gujarati', nativeName: 'ગુજરાતી', bcp47: 'gu-IN' },
-  { code: 'pa', name: 'Punjabi', englishName: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', bcp47: 'pa-IN' },
-  { code: 'bn', name: 'Bengali', englishName: 'Bengali', nativeName: 'বাংলা', bcp47: 'bn-IN' },
-  { code: 'ta', name: 'Tamil', englishName: 'Tamil', nativeName: 'தமிழ்', bcp47: 'ta-IN' },
-  { code: 'te', name: 'Telugu', englishName: 'Telugu', nativeName: 'తెలుగు', bcp47: 'te-IN' },
-  { code: 'kn', name: 'Kannada', englishName: 'Kannada', nativeName: 'ಕನ್ನಡ', bcp47: 'kn-IN' },
-  { code: 'ml', name: 'Malayalam', englishName: 'Malayalam', nativeName: 'മലയാളം', bcp47: 'ml-IN' }
+  { code: 'mr', name: 'मराठी', englishName: 'Marathi', nativeName: 'मराठी', bcp47: 'mr-IN' },
+  { code: 'gu', name: 'ગુજરાતી', englishName: 'Gujarati', nativeName: 'ગુજરાતી', bcp47: 'gu-IN' },
+  { code: 'pa', name: 'ਪੰਜਾਬੀ', englishName: 'Punjabi', nativeName: 'ਪੰਜਾਬੀ', bcp47: 'pa-IN' },
+  { code: 'bn', name: 'বাংলা', englishName: 'Bengali', nativeName: 'বাংলা', bcp47: 'bn-IN' },
+  { code: 'ta', name: 'தமிழ்', englishName: 'Tamil', nativeName: 'தமிழ்', bcp47: 'ta-IN' },
+  { code: 'te', name: 'తెలుగు', englishName: 'Telugu', nativeName: 'తెలుగు', bcp47: 'te-IN' },
+  { code: 'kn', name: 'ಕನ್ನಡ', englishName: 'Kannada', nativeName: 'ಕನ್ನಡ', bcp47: 'kn-IN' },
+  { code: 'ml', name: 'മലയാളം', englishName: 'Malayalam', nativeName: 'മലയാളം', bcp47: 'ml-IN' }
 ];
 
 export function getTTSLangCode(lang: string): string {

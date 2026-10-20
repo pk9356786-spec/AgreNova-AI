@@ -1,50 +1,45 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" width="100%" height="100%">
-  <!-- White Background with soft rounded corners matching the uploaded emblem -->
-  <rect width="200" height="200" rx="36" fill="#FFFFFF" />
-  
-  <!-- AgreNova AI Emblem (Dark Green Radial Dots Pattern) -->
-  <g fill="#042C23">
-    <!-- Center Dot -->
-    <circle cx="100" cy="100" r="3.2" />
-
-    <!-- Ring 1 (Inner dots) -->
-    <circle cx="100" cy="84" r="4.2" />
-    <circle cx="111.3" cy="88.7" r="4.2" />
-    <circle cx="116" cy="100" r="4.2" />
-    <circle cx="111.3" cy="111.3" r="4.2" />
-    <circle cx="100" cy="116" r="4.2" />
-    <circle cx="88.7" cy="111.3" r="4.2" />
-    <circle cx="84" cy="100" r="4.2" />
-    <circle cx="88.7" cy="88.7" r="4.2" />
-
-    <!-- Ring 2 (Middle-Inner dots) -->
-    <circle cx="100" cy="66" r="6.2" />
-    <circle cx="124" cy="76" r="6.2" />
-    <circle cx="134" cy="100" r="6.2" />
-    <circle cx="124" cy="124" r="6.2" />
-    <circle cx="100" cy="134" r="6.2" />
-    <circle cx="76" cy="124" r="6.2" />
-    <circle cx="66" cy="100" r="6.2" />
-    <circle cx="76" cy="76" r="6.2" />
-
-    <!-- Ring 3 (Middle-Outer dots) -->
-    <circle cx="100" cy="45" r="8.5" />
-    <circle cx="138.9" cy="61.1" r="8.5" />
-    <circle cx="155" cy="100" r="8.5" />
-    <circle cx="138.9" cy="138.9" r="8.5" />
-    <circle cx="100" cy="155" r="8.5" />
-    <circle cx="61.1" cy="138.9" r="8.5" />
-    <circle cx="45" cy="100" r="8.5" />
-    <circle cx="61.1" cy="61.1" r="8.5" />
-
-    <!-- Ring 4 (Outer dots) -->
-    <circle cx="100" cy="22" r="11.2" />
-    <circle cx="155.2" cy="44.8" r="11.2" />
-    <circle cx="178" cy="100" r="11.2" />
-    <circle cx="155.2" cy="155.2" r="11.2" />
-    <circle cx="100" cy="178" r="11.2" />
-    <circle cx="44.8" cy="155.2" r="11.2" />
-    <circle cx="22" cy="100" r="11.2" />
-    <circle cx="44.8" cy="44.8" r="11.2" />
+  <g fill="#002C23">
+  <circle cx="100.0" cy="100.0" r="3.4" />
+  <circle cx="100.00" cy="84.00" r="4.30" />
+  <circle cx="100.00" cy="66.00" r="6.30" />
+  <circle cx="100.00" cy="45.00" r="8.60" />
+  <circle cx="100.00" cy="22.00" r="11.20" />
+  <circle cx="111.31" cy="88.69" r="4.30" />
+  <circle cx="124.04" cy="75.96" r="6.30" />
+  <circle cx="138.89" cy="61.11" r="8.60" />
+  <circle cx="155.15" cy="44.85" r="11.20" />
+  <circle cx="116.00" cy="100.00" r="4.30" />
+  <circle cx="134.00" cy="100.00" r="6.30" />
+  <circle cx="155.00" cy="100.00" r="8.60" />
+  <circle cx="178.00" cy="100.00" r="11.20" />
+  <circle cx="111.31" cy="111.31" r="4.30" />
+  <circle cx="124.04" cy="124.04" r="6.30" />
+  <circle cx="138.89" cy="138.89" r="8.60" />
+  <circle cx="155.15" cy="155.15" r="11.20" />
+  <circle cx="100.00" cy="116.00" r="4.30" />
+  <circle cx="100.00" cy="134.00" r="6.30" />
+  <circle cx="100.00" cy="155.00" r="8.60" />
+  <circle cx="100.00" cy="178.00" r="11.20" />
+  <circle cx="88.69" cy="111.31" r="4.30" />
+  <circle cx="75.96" cy="124.04" r="6.30" />
+  <circle cx="61.11" cy="138.89" r="8.60" />
+  <circle cx="44.85" cy="155.15" r="11.20" />
+  <circle cx="84.00" cy="100.00" r="4.30" />
+  <circle cx="66.00" cy="100.00" r="6.30" />
+  <circle cx="45.00" cy="100.00" r="8.60" />
+  <circle cx="22.00" cy="100.00" r="11.20" />
+  <circle cx="88.69" cy="88.69" r="4.30" />
+  <circle cx="75.96" cy="75.96" r="6.30" />
+  <circle cx="61.11" cy="61.11" r="8.60" />
+  <circle cx="44.85" cy="44.85" r="11.20" />
+  <circle cx="108.99" cy="78.29" r="4.80" />
+  <circle cx="121.71" cy="91.01" r="4.80" />
+  <circle cx="121.71" cy="108.99" r="4.80" />
+  <circle cx="108.99" cy="121.71" r="4.80" />
+  <circle cx="91.01" cy="121.71" r="4.80" />
+  <circle cx="78.29" cy="108.99" r="4.80" />
+  <circle cx="78.29" cy="91.01" r="4.80" />
+  <circle cx="91.01" cy="78.29" r="4.80" />
   </g>
 </svg>

@@ -371,11 +371,26 @@ function parseGeminiJson<T>(text: string): T {
 
 
 
+const WEATHER_LANG_CONDITIONS: Record<string, { overcast: string; partlyCloudy: string; clear: string; rain: string; mist: string }> = {
+  en: { overcast: "Overcast Clouds", partlyCloudy: "Partly Cloudy", clear: "Clear Sky", rain: "Rain", mist: "Mist / Fog" },
+  hi: { overcast: "घने बादल", partlyCloudy: "आंशिक बादल", clear: "साफ मौसम", rain: "बारिश", mist: "धुंध" },
+  mr: { overcast: "दाट ढग", partlyCloudy: "अंशतः ढगाळ", clear: "निरभ्र आकाश", rain: "पाऊस", mist: "धुके" },
+  gu: { overcast: "વાદળછાયું વાતાવરણ", partlyCloudy: "આંશિક વાદળછાયું", clear: "ચોખ્ખું આકાશ", rain: "વરસાદ", mist: "ધુમ્મસ" },
+  pa: { overcast: "ਸੰਘਣੇ ਬੱਦਲ", partlyCloudy: "ਅੰਸ਼ਕ ਬੱਦਲਵਾਈ", clear: "ਸਾਫ਼ ਮੌਸਮ", rain: "ਮੀਂਹ", mist: "ਧੁੰਦ" },
+  bn: { overcast: "মেঘলা আকাশ", partlyCloudy: "আংশিক মেঘলা", clear: "পরিষ্কার আকাশ", rain: "বৃষ্টি", mist: "কুয়াশা" },
+  ta: { overcast: "அடர்ந்த மேகமூட்டம்", partlyCloudy: "பகுதி மேகமூட்டம்", clear: "தெளிவான வானம்", rain: "மழை", mist: "மூடுபனி" },
+  te: { overcast: "దట్టమైన మేఘాలు", partlyCloudy: "పాక్షికంగా మేఘావృతం", clear: "నిర్మలమైన ఆకాశం", rain: "వర్షం", mist: "పొగమంచు" },
+  kn: { overcast: "ದಟ್ಟ ಮೋಡ", partlyCloudy: "ಭಾಗಶಃ ಮೋಡ", clear: "ಸ್ವಚ್ಛ ಆಕಾಶ", rain: "ಮಳೆ", mist: "ಮಂಜು" },
+  ml: { overcast: "കാർമേഘാവൃതം", partlyCloudy: "ഭാഗികമായി മേഘാവൃതം", clear: "തെളിഞ്ഞ ആകാശം", rain: "മഴ", mist: "മൂടൽമഞ്ഞ്" },
+};
+
 function mapExactWeatherCondition(mainRaw?: string, descRaw?: string, langCode: string = "hi"): string {
   const main = (mainRaw || "Clear").trim();
   const desc = (descRaw || "").toLowerCase().trim();
+  const langKey = (langCode || "hi").toLowerCase();
+  const conds = WEATHER_LANG_CONDITIONS[langKey] || WEATHER_LANG_CONDITIONS["hi"] || WEATHER_LANG_CONDITIONS["en"];
 
-  if (langCode === "en") {
+  if (langKey === "en") {
     if (main === "Clear") return "Clear Sky";
     if (main === "Clouds") {
       if (desc.includes("few")) return "Few Clouds";
@@ -393,26 +408,110 @@ function mapExactWeatherCondition(mainRaw?: string, descRaw?: string, langCode: 
     return main;
   }
 
-  // Exact mappings requested for Hindi/regional languages:
   if (main === "Clouds" || desc.includes("cloud") || desc.includes("बादल")) {
-    if (desc.includes("overcast") || desc.includes("घने")) return "घने बादल";
-    return "आंशिक बादल";
+    if (desc.includes("overcast") || desc.includes("घने") || desc.includes("दाट") || desc.includes("ਸੰਘਣੇ") || desc.includes("ঘন") || desc.includes("அடர்ந்த") || desc.includes("దట్టమైన") || desc.includes("ದಟ್ಟ") || desc.includes("കാർമേഘ")) {
+      return conds.overcast;
+    }
+    return conds.partlyCloudy;
   }
 
-  if (main === "Clear" || desc.includes("clear") || desc.includes("साफ")) {
-    return "साफ मौसम";
+  if (main === "Clear" || desc.includes("clear") || desc.includes("साफ") || desc.includes("निरभ्र") || desc.includes("ચોખ્ખું") || desc.includes("ਸਾਫ਼") || desc.includes("পরিষ্কার") || desc.includes("தெளிவான") || desc.includes("నిర్మలమైన") || desc.includes("ಸ್ವಚ್ಛ") || desc.includes("തെളിഞ്ഞ")) {
+    return conds.clear;
   }
 
-  if (main === "Rain" || main === "Drizzle" || main === "Thunderstorm" || desc.includes("rain") || desc.includes("वर्षा") || desc.includes("बारिश")) {
-    return "बारिश";
+  if (main === "Rain" || main === "Drizzle" || main === "Thunderstorm" || desc.includes("rain") || desc.includes("वर्षा") || desc.includes("बारिश") || desc.includes("पाऊस") || desc.includes("વરસાદ") || desc.includes("ਮੀਂਹ") || desc.includes("বৃষ্টি") || desc.includes("மழை") || desc.includes("వర్షం") || desc.includes("ಮಳೆ") || desc.includes("മഴ")) {
+    return conds.rain;
   }
 
-  if (main === "Haze" || main === "Mist" || main === "Smoke" || main === "Fog" || desc.includes("haze") || desc.includes("mist") || desc.includes("smoke") || desc.includes("fog") || desc.includes("धुंध") || desc.includes("कोहरा")) {
-    return "धुंध";
+  if (main === "Haze" || main === "Mist" || main === "Smoke" || main === "Fog" || desc.includes("haze") || desc.includes("mist") || desc.includes("smoke") || desc.includes("fog") || desc.includes("धुंध") || desc.includes("धुके") || desc.includes("ધુમ્મસ") || desc.includes("ਧੁੰਦ") || desc.includes("কুয়াশা") || desc.includes("மூடுபனி") || desc.includes("పొగమంచు") || desc.includes("ಮಂಜು") || desc.includes("മൂടൽമഞ്ഞ്")) {
+    return conds.mist;
   }
 
-  return "साफ मौसम";
+  return conds.clear;
 }
+
+const WEATHER_LANG_ADVISORIES: Record<string, { rain: string; wind: string; heat: string; favorable: string; notAvailable: string; facts: (h: number, w: number, c: number) => string }> = {
+  en: {
+    rain: "Rain expected. Defer spraying and field irrigation for now.",
+    wind: "High wind speed. Avoid pesticide spraying and support standing crops.",
+    heat: "High temperature today. Ensure light irrigation in early morning or evening.",
+    favorable: "Weather is favorable today for pesticide spraying, fertilization, and regular farm work.",
+    notAvailable: "Not available",
+    facts: (h, w, c) => `Humidity: ${h}%, Wind: ${w} m/s, Clouds: ${c}%`
+  },
+  hi: {
+    rain: "वर्षा की संभावना है। फसलों पर कीटनाशक का छिड़काव और सिंचाई फिलहाल रोकें।",
+    wind: "तेज हवा चलने की संभावना है। छिड़काव टालें तथा ऊंची फसलों को सहारा दें।",
+    heat: "तापमान अधिक है। फसलों में सुबह या शाम के समय हल्की सिंचाई करें।",
+    favorable: "आज का मौसम अनुकूल है। फसल छिड़काव, खाद प्रबंधन व अन्य कृषि कार्य किए जा सकते हैं।",
+    notAvailable: "उपलब्ध नहीं",
+    facts: (h, w, c) => `आर्द्रता: ${h}%, हवा: ${w} m/s, बादल: ${c}%`
+  },
+  mr: {
+    rain: "पावसाची शक्यता आहे. पिकांवर कीटकनाशक फवारणी आणि सिंचन सध्या टाळा.",
+    wind: "जोरदार वारे वाहण्याची शक्यता आहे. फवारणी टाळा आणि उंच पिकांना आधार द्या.",
+    heat: "तापमान जास्त आहे. सकाळी किंवा संध्याकाळी पिकांना हलके पाणी द्या.",
+    favorable: "आजचे हवामान अनुकूल आहे. कीटकनाशक फवारणी, खत व्यवस्थापन आणि शेतीची कामे करता येतील.",
+    notAvailable: "उपलब्ध नाही",
+    facts: (h, w, c) => `आर्द्रता: ${h}%, वारा: ${w} m/s, ढग: ${c}%`
+  },
+  gu: {
+    rain: "વરસાદની સંભાવના છે. પાક પર જંતુનાશક છંટકાવ અને પિયત હાલ પૂરતું મોકૂફ રાખો.",
+    wind: "ઝડપી પવનની શક્યતા છે. છંટકાવ ટાળો અને ઊંચા પાકને ટેકો આપો.",
+    heat: "તાપમાન ઊંચું છે. સવારે કે સાંજે પાકને હળવું પિયત આપો.",
+    favorable: "આજનું હવામાન અનુકૂળ છે. પાક છંટકાવ, ખાતર વ્યવસ્થાપન અને ખેતી કાર્યો કરી શકાય છે.",
+    notAvailable: "ઉપલબ્ધ નથી",
+    facts: (h, w, c) => `ભેજ: ${h}%, પવન: ${w} m/s, વાદળ: ${c}%`
+  },
+  pa: {
+    rain: "ਮੀਂਹ ਦੀ ਸੰਭਾਵਨਾ ਹੈ। ਫ਼ਸਲਾਂ 'ਤੇ ਕੀਟਨਾਸ਼ਕ ਸਪਰੇਅ ਅਤੇ ਸਿੰਚਾਈ ਫਿਲਹਾਲ ਰੋਕੋ।",
+    wind: "ਤੇਜ਼ ਹਵਾਵਾਂ ਚੱਲਣ ਦਾ ਖ਼ਦਸ਼ਾ ਹੈ। ਸਪਰੇਅ ਟਾਲੋ ਅਤੇ ਉੱਚੀਆਂ ਫ਼ਸਲਾਂ ਨੂੰ ਸਹਾਰਾ ਦਿਓ।",
+    heat: "ਤਾਪਮਾਨ ਵੱਧ ਹੈ। ਫ਼ਸਲਾਂ ਨੂੰ ਸਵੇਰੇ ਜਾਂ ਸ਼ਾਮ ਨੂੰ ਹਲਕਾ ਪਾਣੀ ਲਗਾਓ।",
+    favorable: "ਅੱਜ ਦਾ ਮੌਸਮ ਅਨੁਕੂਲ ਹੈ। ਫ਼ਸਲ ਸਪਰੇਅ, ਖਾਦ ਪ੍ਰਬੰਧਨ ਅਤੇ ਖੇਤੀ ਦੇ ਕੰਮ ਕੀਤੇ ਜਾ ਸਕਦੇ ਹਨ।",
+    notAvailable: "ਉਪਲਬਧ ਨਹੀਂ",
+    facts: (h, w, c) => `ਸਿੱਲ੍ਹ: ${h}%, ਹਵਾ: ${w} m/s, ਬੱਦਲ: ${c}%`
+  },
+  bn: {
+    rain: "বৃষ্টির সম্ভাবনা রয়েছে। ফসলে কীটনাশক স্প্রে এবং সেচ আপাতত স্থগিত রাখুন।",
+    wind: "ঝড়ো বাতাসের সম্ভাবনা। স্প্রে করা এড়িয়ে চলুন এবং লম্বা ফসলকে ঠেকনা দিন।",
+    heat: "উচ্চ তাপমাত্রা। সকালে বা বিকেলে ফসলে হালকা সেচ দিন।",
+    favorable: "আজকের আবহাওয়া অনুকূল। স্প্রে, সার ব্যবস্থাপনা ও কৃষিকাজ করা যেতে পারে।",
+    notAvailable: "উপলব্ধ নয়",
+    facts: (h, w, c) => `আর্দ্রতা: ${h}%, বাতাস: ${w} m/s, মেঘ: ${c}%`
+  },
+  ta: {
+    rain: "மழைக்கு வாய்ப்புள்ளது. பூச்சிக்கொல்லி தெளிப்பதையும் பாசனத்தையும் தற்காலிகமாக ஒத்திவைக்கவும்.",
+    wind: "அதிவேக காற்று வீசக்கூடும். தெளிப்பைத் தவிர்க்கவும், உயரமான பயிர்களைத் தாங்கவும்.",
+    heat: "வெப்பநிலை அதிகம். காலை அல்லது மாலையில் பயிருக்கு லேசான பாசனம் செய்யவும்.",
+    favorable: "இன்றைய வானிலை சாதகமானது. தெளிப்பு, உர மேலாண்மை மற்றும் விவசாயப் பணிகளைச் செய்யலாம்.",
+    notAvailable: "கிடைக்கவில்லை",
+    facts: (h, w, c) => `ஈரப்பதம்: ${h}%, காற்று: ${w} m/s, மேகம்: ${c}%`
+  },
+  te: {
+    rain: "వర్షం కురిసే అవకాశం ఉంది. పంటలపై పురుగుమందుల పిచికారీ మరియు నీటిపారుదల ప్రస్తుతానికి నిలిపివేయండి.",
+    wind: "ఈదురు గాలులు వీచే అవకాశం ఉంది. పిచికారీని వాయిదా వేయండి.",
+    heat: "ఉష్ణోగ్రత ఎక్కువగా ఉంది. ఉదయం లేదా సాయంత్రం వేళల్లో పంటలకు తేలికపాటి తడి ఇవ్వండి.",
+    favorable: "నేటి వాతావరణం అనుకూలంగా ఉంది. పిచికారీ, ఎరువుల నిర్వహణ పనులు చేసుకోవచ్చు.",
+    notAvailable: "అందుబాటులో లేదు",
+    facts: (h, w, c) => `తేమ: ${h}%, గాలి: ${w} m/s, మబ్బులు: ${c}%`
+  },
+  kn: {
+    rain: "ಮಳೆಯಾಗುವ ಸಾಧ್ಯತೆಯಿದೆ. ಕೀಟನಾಶಕ ಸಿಂಪಡಣೆ ಮತ್ತು ನೀರಾವರಿಯನ್ನು ಸದ್ಯಕ್ಕೆ ಮುಂದೂಡಿ.",
+    wind: "ಬಲವಾದ ಗಾಳಿಯ ಸಾಧ್ಯತೆಯಿದೆ. ಸಿಂಪಡಣೆಯನ್ನು ತಪ್ಪಿಸಿ ಮತ್ತು ಎತ್ತರದ ಬೆಳೆಗಳಿಗೆ ಆಧಾರ ನೀಡಿ.",
+    heat: "ತಾಪಮಾನ ಹೆಚ್ಚಾಗಿದೆ. ಬೆಳಿಗ್ಗೆ ಅಥವಾ ಸಂಜೆ ಬೆಳೆಗಳಿಗೆ ಲಘು ನೀರಾವರಿ ನೀಡಿ.",
+    favorable: "ಇಂದಿನ ಹವಾಮಾನವು ಅನುಕೂಲಕರವಾಗಿದೆ. ಬೆಳೆ ಸಿಂಪಡಣೆ, ರಸಗೊಬ್ಬರ ನಿರ್ವಹಣೆ ಮಾಡಬಹುದು.",
+    notAvailable: "ಲಭ್ಯವಿಲ್ಲ",
+    facts: (h, w, c) => `ಆರ್ದ್ರತೆ: ${h}%, ಗಾಳಿ: ${w} m/s, ಮೋಡ: ${c}%`
+  },
+  ml: {
+    rain: "മഴയ്ക്ക് സാധ്യതയുണ്ട്. കീടനാശിനി പ്രയോഗവും ജലസേചനവും തൽക്കാലം ഒഴിവാക്കുക.",
+    wind: "ശക്തമായ കാറ്റിന് സാധ്യതയുണ്ട്. സ്പ്രേ ചെയ്യുന്നത് ഒഴിവാക്കുക.",
+    heat: "താപനില കൂടുതലാണ്. രാവിലെ അല്ലെങ്കിൽ വൈകുന്നേരം നേരിയ നന നൽകുക.",
+    favorable: "ഇന്നത്തെ കാലാവസ്ഥ അനുകൂലമാണ്. മരുന്ന് തളിക്കൽ, വളപ്രയോഗം എന്നിവ നടത്താം.",
+    notAvailable: "ലഭ്യമല്ല",
+    facts: (h, w, c) => `ഈർപ്പം: ${h}%, കാറ്റ്: ${w} m/s, മേഘം: ${c}%`
+  }
+};
 
 async function fetchDynamicWeatherData(state?: string, district?: string, langCode: string = "hi", bypassCache = false) {
   const startTime = Date.now();
@@ -466,7 +565,9 @@ async function fetchDynamicWeatherData(state?: string, district?: string, langCo
       const cloudsVal = owmData.clouds?.all ?? owmData.main?.clouds ?? 0;
       const windVal = owmData.wind?.speed ?? 0;
 
-      let rainPText: string = "उपलब्ध नहीं";
+      const advConfig = WEATHER_LANG_ADVISORIES[langKey] || WEATHER_LANG_ADVISORIES["hi"] || WEATHER_LANG_ADVISORIES["en"];
+
+      let rainPText: string = advConfig.notAvailable;
       if (owmData.pop !== undefined && typeof owmData.pop === "number") {
         rainPText = `${Math.round(owmData.pop * 100)}%`;
       } else if (owmData.rain_probability !== undefined && typeof owmData.rain_probability === "number") {
@@ -477,32 +578,16 @@ async function fetchDynamicWeatherData(state?: string, district?: string, langCo
       const isHighWind = windVal > 5;
       const isHighTemp = tempVal > 38;
 
-      let advisoryText = "";
-      if (langKey === "en") {
-        if (isRainyOrThunder) {
-          advisoryText = "Rain expected. Defer spraying and field irrigation for now.";
-        } else if (isHighWind) {
-          advisoryText = "High wind speed. Avoid pesticide spraying and support standing crops.";
-        } else if (isHighTemp) {
-          advisoryText = "High temperature today. Ensure light irrigation in early morning or evening.";
-        } else {
-          advisoryText = "Weather is favorable today for pesticide spraying, fertilization, and regular farm work.";
-        }
-      } else {
-        if (isRainyOrThunder) {
-          advisoryText = "वर्षा की संभावना है। फसलों पर कीटनाशक का छिड़काव और सिंचाई फिलहाल रोकें।";
-        } else if (isHighWind) {
-          advisoryText = "तेज हवा चलने की संभावना है। छिड़काव टालें तथा ऊंची फसलों को सहारा दें।";
-        } else if (isHighTemp) {
-          advisoryText = "तापमान अधिक है। फसलों में सुबह या शाम के समय हल्की सिंचाई करें।";
-        } else {
-          advisoryText = "आज का मौसम अनुकूल है। फसल छिड़काव, खाद प्रबंधन व अन्य कृषि कार्य किए जा सकते हैं।";
-        }
+      let advisoryText = advConfig.favorable;
+      if (isRainyOrThunder) {
+        advisoryText = advConfig.rain;
+      } else if (isHighWind) {
+        advisoryText = advConfig.wind;
+      } else if (isHighTemp) {
+        advisoryText = advConfig.heat;
       }
 
-      const weatherFactsStr = langKey === "en"
-        ? `Humidity: ${humidityVal}%, Wind: ${windVal} m/s, Clouds: ${cloudsVal}%`
-        : `आर्द्रता: ${humidityVal}%, हवा: ${windVal} m/s, बादल: ${cloudsVal}%`;
+      const weatherFactsStr = advConfig.facts(humidityVal, windVal, cloudsVal);
 
       const result = {
         coord: owmData.coord || { lon: coords.lon, lat: coords.lat },
@@ -1408,7 +1493,14 @@ function generateFallbackCropAnalysis(profile: any) {
 }
 
 // Standalone fallback response generator for farmer questions when API quota is exhausted or key missing
-async function generateFallbackQuestionResponse(question: string, profile: any, weather?: any, recentDiagnosis?: any) {
+async function generateFallbackQuestionResponse(
+  question: string, 
+  profile: any, 
+  weather?: any, 
+  recentDiagnosis?: any,
+  targetLangCode: string = 'hi',
+  targetLangName: string = 'Hindi'
+) {
   const cleanQ = question.trim();
   const lowerQ = cleanQ.toLowerCase();
   const name = profile?.name ? (profile.name.includes('जी') ? profile.name : `${profile.name} जी`) : 'पवन कुमार जी';
@@ -1588,6 +1680,36 @@ async function generateFallbackQuestionResponse(question: string, profile: any, 
     quickReplies = [`${cropNameHi} में खाद प्रबंधन`, `${cropNameHi} में सिंचाई का समय`, `${cropNameHi} की फोटो अपलोड करें`, `${district} में ${cropNameHi} भाव`];
   }
 
+  if (targetLangCode !== 'hi') {
+    try {
+      const ai = getAI();
+      const trRes = await ai.models.generateContent({
+        model: 'gemini-2.5-flash',
+        contents: [{
+          role: 'user',
+          parts: [{
+            text: `Translate this agricultural advice and quick replies into ${targetLangName} native script. Maintain respectful farmer tone and markdown bullet points. Return JSON:\n{\n  "answer": "...",\n  "quickReplies": ["..."]\n}\n\nContent:\n${answer}\n\nQuick Replies:\n${JSON.stringify(quickReplies)}`
+          }]
+        }],
+        config: {
+          responseMimeType: 'application/json'
+        }
+      });
+      if (trRes.text) {
+        const parsed = parseGeminiJson<any>(trRes.text);
+        if (parsed?.answer) {
+          return {
+            answer: parsed.answer,
+            cropMentioned: matchedCrop || undefined,
+            quickReplies: Array.isArray(parsed.quickReplies) ? parsed.quickReplies : quickReplies
+          };
+        }
+      }
+    } catch (_trErr) {
+      // Graceful fallback to base answer
+    }
+  }
+
   return {
     answer,
     cropMentioned: matchedCrop || undefined,
@@ -1671,10 +1793,17 @@ async function startServer() {
 
       let contextPrompt = 'तुम एक सर्वश्रेष्ठ वरिष्ठ कृषि विशेषज्ञ (Senior Agricultural Scientist) हो। इस फसल की फोटो का वैज्ञानिक और व्यावहारिक दृष्टिकोण से अत्यंत सूक्ष्मता के साथ विश्लेषण करो।';
       const targetLangName = req.body.langName || 'Hindi';
+      const targetLangCode = req.body.langCode || 'hi';
+      const isHindiTarget = targetLangCode === 'hi' || (!req.body.langCode && targetLangName.toLowerCase().includes('hindi'));
+
       if (profile) {
         contextPrompt += `\nसंदर्भ के लिए, यह किसान ${profile.state || 'भारत'} के ${profile.district || 'स्थानीय क्षेत्र'} से है, जिनकी मुख्य फसल ${profile.crop || 'दी गई फसल'} है और भूमि का आकार ${profile.landSize || '1'} एकड़ है, तथा मिट्टी का प्रकार ${profile.soilType || 'साधारण मिट्टी'} है।`;
       }
-      contextPrompt += `\n\nCRITICAL INSTRUCTION: Generate the entire JSON analysis report in the ${targetLangName} language so the farmer can easily read it in their native language.`;
+      contextPrompt += `\n\nCRITICAL INSTRUCTION: Generate the entire JSON analysis report in the ${targetLangName} language (${targetLangCode === 'en' ? 'in clear English' : 'written in native script'}) so the farmer can easily read it in their native language.`;
+
+      const analysisPromptText = isHindiTarget 
+        ? `${contextPrompt}\n\nकृपया संभावित बीमारी, कीट, पोषक तत्व की कमी या अन्य समस्या की पहचान करें और सरल व व्यावहारिक हिंदी में पूरी रिपोर्ट दें। वैज्ञानिक नाम भी शामिल करें।\n\nजवाब को इस सटीक JSON प्रारूप में ही दें, कोई अतिरिक्त टेक्स्ट या मार्कडाउन के बिना:\n{\n  "disease": "बीमारी या समस्या का हिंदी और अंग्रेजी में नाम (जैसे: धान का झोंका रोग (Rice Blast))",\n  "scientificName": "बीमारी या कीट का सटीक वैज्ञानिक नाम",\n  "confidence": "सटीकता प्रतिशत (जैसे: 92%)",\n  "severity": "संक्रमण की गंभीरता स्तर: 'उच्च' या 'मध्यम' या 'कम' में से एक ही शब्द चुनें",\n  "cropLoss": "संभावित फसल नुकसान का अनुमान (जैसे: 20-30%)",\n  "recoveryTimeline": "उपचार के बाद ठीक होने की संभावित अवधि (जैसे: 10-15 दिन)",\n  "description": "फोटो में दिखने वाले लक्षणों का विस्तृत हिंदी विवरण",\n  "preventionTips": "भविष्य में इस बीमारी से बचाव के लिए 2-3 प्रभावी कदम (बुलेट पॉइंट्स या लाइनों में)",\n  "organicTreatment": "जैविक और प्राकृतिक उपचार विधि (जैसे नीम का तेल, स्यूडोमोनास या अन्य देसी उपाय)",\n  "chemicalTreatment": "रासायनिक उपचार विधि (सटीक कवकनाशी/कीटनाशी का नाम और मात्रा जैसे: 1 मिली/लीटर)",\n  "advice": "किसान के लिए सरल, आत्मीय और तुरंत की जाने वाली समग्र सलाह"\n}`
+        : `${contextPrompt}\n\nPlease identify the probable crop disease, pest infestation, nutrient deficiency, or physiological issue and generate the complete diagnosis report in ${targetLangName} (${targetLangCode === 'en' ? 'English' : 'native script'}). Include the precise Latin scientific name.\n\nRespond in this exact JSON format without additional text or markdown:\n{\n  "disease": "Disease or issue name in ${targetLangName}",\n  "scientificName": "Accurate Latin botanical or scientific name",\n  "confidence": "Confidence percentage (e.g. 92%)",\n  "severity": "Severity level (e.g. High / Medium / Low)",\n  "cropLoss": "Estimated potential crop loss (e.g. 15-25%)",\n  "recoveryTimeline": "Expected recovery period after treatment (e.g. 7-10 days)",\n  "description": "Detailed visual symptom description in ${targetLangName}",\n  "preventionTips": "2-3 actionable preventative measures in ${targetLangName}",\n  "organicTreatment": "Organic and biological remedy recommendations in ${targetLangName}",\n  "chemicalTreatment": "Certified chemical fungicide/insecticide dosage in ${targetLangName}",\n  "advice": "Clear, practical, and empathetic farmer advisory in ${targetLangName}"\n}`;
 
       const response = await ai.models.generateContent({
         model: 'gemini-2.5-flash',
@@ -1683,7 +1812,7 @@ async function startServer() {
             role: 'user',
             parts: [
               {
-                text: `${contextPrompt}\n\nकृपया संभावित बीमारी, कीट, पोषक तत्व की कमी या अन्य समस्या की पहचान करें और सरल व व्यावहारिक हिंदी में पूरी रिपोर्ट दें। वैज्ञानिक नाम भी शामिल करें।\n\nजवाब को इस सटीक JSON प्रारूप में ही दें, कोई अतिरिक्त टेक्स्ट या मार्कडाउन के बिना:\n{\n  "disease": "बीमारी या समस्या का हिंदी और अंग्रेजी में नाम (जैसे: धान का झोंका रोग (Rice Blast))",\n  "scientificName": "बीमारी या कीट का सटीक वैज्ञानिक नाम",\n  "confidence": "सटीकता प्रतिशत (जैसे: 92%)",\n  "severity": "संक्रमण की गंभीरता स्तर: 'उच्च' या 'मध्यम' या 'कम' में से एक ही शब्द चुनें",\n  "cropLoss": "संभावित फसल नुकसान का अनुमान (जैसे: 20-30%)",\n  "recoveryTimeline": "उपचार के बाद ठीक होने की संभावित अवधि (जैसे: 10-15 दिन)",\n  "description": "फोटो में दिखने वाले लक्षणों का विस्तृत हिंदी विवरण",\n  "preventionTips": "भविष्य में इस बीमारी से बचाव के लिए 2-3 प्रभावी कदम (बुलेट पॉइंट्स या लाइनों में)",\n  "organicTreatment": "जैविक और प्राकृतिक उपचार विधि (जैसे नीम का तेल, स्यूडोमोनास या अन्य देसी उपाय)",\n  "chemicalTreatment": "रासायनिक उपचार विधि (सटीक कवकनाशी/कीटनाशी का नाम और मात्रा जैसे: 1 मिली/लीटर)",\n  "advice": "किसान के लिए सरल, आत्मीय और तुरंत की जाने वाली समग्र सलाह"\n}`
+                text: analysisPromptText
               },
               {
                 inlineData: {
@@ -1755,13 +1884,16 @@ async function startServer() {
   app.post('/api/ask-question', async (req, res) => {
     try {
       const { question, profile, weather, recentDiagnosis, history } = req.body;
+      const targetLangName = req.body.langName || 'Hindi';
+      const targetLangCode = req.body.langCode || 'hi';
+
       if (!question) {
         return res.status(400).json({ error: 'कृपया अपना प्रश्न लिखें या बोलें।' });
       }
 
       if (Date.now() < geminiQuotaExhaustedUntil) {
         console.warn('Gemini rate limit currently active, using fallback question response');
-        const fallback = await generateFallbackQuestionResponse(question, profile);
+        const fallback = await generateFallbackQuestionResponse(question, profile, weather, recentDiagnosis, targetLangCode, targetLangName);
         return res.json(fallback);
       }
 
@@ -1769,14 +1901,11 @@ async function startServer() {
         getAI();
       } catch (err: any) {
         console.warn('GEMINI_API_KEY missing, using mock response for query:', question);
-        const fallback = await generateFallbackQuestionResponse(question, profile);
+        const fallback = await generateFallbackQuestionResponse(question, profile, weather, recentDiagnosis, targetLangCode, targetLangName);
         return res.json(fallback);
       }
 
       const ai = getAI();
-
-      const targetLangName = req.body.langName || 'Hindi';
-      const targetLangCode = req.body.langCode || 'hi';
       const farmerName = profile?.name ? (profile.name.includes('जी') ? profile.name : `${profile.name} जी`) : 'पवन कुमार जी';
       const farmerDistrict = profile?.district || 'खैरथल-तिजारा';
       const farmerState = profile?.state || 'राजस्थान';
@@ -1903,20 +2032,45 @@ When the farmer gives a quantity, land area, weight, number, or measurement, cal
 
 # DISEASE AND PEST DIAGNOSIS RULE
 - Do not claim certainty when there is insufficient evidence. Use wording like "संभावित कारण", "लक्षणों के आधार पर", "सटीक पहचान हेतु फोटो भी भेज सकते हैं".
-- Suggest practical chemical and organic treatments with accurate per-liter and per-acre dosages.
+- Suggest practical chemical and organic treatments with accurate per-liter and per-acre dosages.`;
 
-# LANGUAGE RULE
-- Reply in ${targetLangName} native script (pure Devanagari script for Hindi, even if typed in Roman/Hinglish).
-- Keep terminology understandable for Indian farmers.`;
+      const SCRIPT_INFO: Record<string, { script: string; nativeName: string; langEn: string }> = {
+        hi: { script: 'Devanagari script', nativeName: 'हिन्दी', langEn: 'Hindi' },
+        en: { script: 'English alphabet', nativeName: 'English', langEn: 'English' },
+        mr: { script: 'Devanagari script (Marathi)', nativeName: 'मराठी', langEn: 'Marathi' },
+        gu: { script: 'Gujarati script', nativeName: 'ગુજરાતી', langEn: 'Gujarati' },
+        pa: { script: 'Gurmukhi script', nativeName: 'ਪੰਜਾਬੀ', langEn: 'Punjabi' },
+        bn: { script: 'Bengali script', nativeName: 'বাংলা', langEn: 'Bengali' },
+        ta: { script: 'Tamil script', nativeName: 'தமிழ்', langEn: 'Tamil' },
+        te: { script: 'Telugu script', nativeName: 'తెలుగు', langEn: 'Telugu' },
+        kn: { script: 'Kannada script', nativeName: 'ಕನ್ನಡ', langEn: 'Kannada' },
+        ml: { script: 'Malayalam script', nativeName: 'മലയാളം', langEn: 'Malayalam' }
+      };
 
-      systemInstruction += `\n\nFormat response as JSON:\n{\n  "answer": "Accurate, direct, structured and practical answer in ${targetLangName} native script",\n  "cropMentioned": "Identified crop name if any",\n  "quickReplies": ["2 to 4 relevant follow-up suggestions in ${targetLangName} native script"]\n}`;
+      const langMeta = SCRIPT_INFO[targetLangCode] || { script: `${targetLangName} script`, nativeName: targetLangName, langEn: targetLangName };
 
-      let userPrompt = `किसान का प्रश्न: "${question}"`;
-      if (isLatinInput && (targetLangCode === 'hi' || targetLangName.toLowerCase().includes('hindi'))) {
-        userPrompt += `\n(ध्यान दें: किसान ने यह प्रश्न अंग्रेजी/रोमन लिपि में रोमन हिंदी / हिन्गलिश (Roman Hindi/Hinglish) में लिखा है: "${question}"। कृपया इसे शुद्ध हिंदी के संदर्भ में (जैसे धान, गेहूं, कपास, बाजरा, बुवाई, कीट, खाद) समझते हुए केवल और केवल देवनागरी हिंदी लिपि (Devanagari Hindi) में ही संपूर्ण और प्रत्यक्ष उत्तर दें।)`;
-      } else if (isLatinInput && targetLangCode !== 'en') {
-        userPrompt += `\n(Note: The farmer typed in Latin/Roman script: "${question}". Please interpret this in ${targetLangName} and generate the answer ONLY in native ${targetLangName} script.)`;
-      }
+      systemInstruction += `\n\n# ABSOLUTE LANGUAGE AND SCRIPT REQUIREMENT: ${langMeta.langEn.toUpperCase()} (${langMeta.nativeName})
+Selected Target Language: ${langMeta.langEn} (${langMeta.nativeName})
+Required Output Script: ${langMeta.script}
+
+CRITICAL RULES FOR CHAT SAHAYAK:
+1. You MUST generate both the "answer" field and ALL items in "quickReplies" 100% in ${langMeta.langEn} using ${langMeta.script}.
+2. Regardless of what language or script the farmer used to write or speak their question (whether Latin/Roman script, Hindi, Hinglish, English, or another regional script like "Gehu ki fasal mein peele patte kyu aa rahe hain?"), YOU MUST UNDERSTAND THE QUERY AND RESPOND EXCLUSIVELY IN ${langMeta.langEn} (${langMeta.nativeName}) SCRIPT.
+3. The language of the farmer's question must NEVER override or alter your output language. Do NOT default or revert to Hindi or English when ${langMeta.langEn} is selected.
+4. Maintain full agronomic depth, clear step-by-step guidance, accurate dosages, bullet points, and respectful farmer-friendly tone in natural ${langMeta.langEn}.
+5. ALL quick replies MUST be in ${langMeta.langEn} (${langMeta.script}).`;
+
+      systemInstruction += `\n\nFormat response as JSON:
+{
+  "answer": "Accurate, direct, structured and practical agricultural answer written entirely in ${langMeta.langEn} (${langMeta.script})",
+  "cropMentioned": "Identified crop name in ${langMeta.langEn}",
+  "quickReplies": ["2 to 4 relevant follow-up suggestions in ${langMeta.langEn} (${langMeta.script})"]
+}`;
+
+      let userPrompt = `Farmer's Query: "${question}"
+Target Output Language: ${langMeta.langEn} (${langMeta.nativeName})
+Required Output Script: ${langMeta.script}
+Instruction: Understand the farmer's question above (even if written in Roman/Latin, Hindi, English, or another language) and write the entire answer and all quick replies strictly in ${langMeta.langEn} (${langMeta.script}). Do not output in any other language.`;
 
       // Build conversation contents (including recent history turns if available)
       const contentsPayload: any[] = [];
@@ -1961,25 +2115,34 @@ When the farmer gives a quantity, land area, weight, number, or measurement, cal
         });
       } catch (genErr) {
         console.warn('Gemini 2.5 flash error, trying with gemini-2.5-pro or fallback', genErr);
-        const fallback = await generateFallbackQuestionResponse(question, profile, weather, recentDiagnosis);
+        const fallback = await generateFallbackQuestionResponse(question, profile, weather, recentDiagnosis, targetLangCode, targetLangName);
         return res.json(fallback);
       }
 
       const text = response.text;
       if (text) {
         try {
-          const result = parseGeminiJson(text);
-          return res.json(result);
+          const result = parseGeminiJson<any>(text);
+          if (result && result.answer) {
+            return res.json(result);
+          }
         } catch {
-          return res.json({ answer: text, quickReplies: ['कीट नियंत्रण', 'सिंचाई प्रबंधन'] });
+          return res.json({ answer: text, quickReplies: [] });
         }
       }
 
-      const fallback = await generateFallbackQuestionResponse(question, profile, weather, recentDiagnosis);
+      const fallback = await generateFallbackQuestionResponse(question, profile, weather, recentDiagnosis, targetLangCode, targetLangName);
       res.json(fallback);
     } catch (error: any) {
       console.error('Error in /api/ask-question:', error);
-      const fallback = await generateFallbackQuestionResponse(req.body?.question || '', req.body?.profile, req.body?.weather, req.body?.recentDiagnosis);
+      const fallback = await generateFallbackQuestionResponse(
+        req.body?.question || '', 
+        req.body?.profile, 
+        req.body?.weather, 
+        req.body?.recentDiagnosis,
+        req.body?.langCode || 'hi',
+        req.body?.langName || 'Hindi'
+      );
       return res.json(fallback);
     }
   });
@@ -2016,6 +2179,9 @@ When the farmer gives a quantity, land area, weight, number, or measurement, cal
       res.status(500).json({ error: 'अनुवाद करने में त्रुटि हुई।' });
     }
   });
+
+  // Explicitly serve public assets (videos, images, icons)
+  app.use(express.static(path.resolve('public')));
 
   // Serve static files / Vite middleware
   if (process.env.NODE_ENV === 'production') {
