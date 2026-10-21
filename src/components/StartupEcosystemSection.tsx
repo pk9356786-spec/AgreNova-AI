@@ -6,8 +6,8 @@ export const StartupEcosystemSection: React.FC<{ selectedLang?: string }> = Reac
   const eco = getCortevaEcosystemStrings(selectedLang);
 
   return (
-    <div id="founder-ecosystem-subsection" className="pt-8 border-t border-emerald-800/60">
-      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-5">
+    <div id="founder-ecosystem-subsection" className="pt-6 border-t border-emerald-800/60">
+      <div className="flex flex-col sm:flex-row sm:items-baseline justify-between gap-2 mb-4">
         <div>
           <h4 className="text-sm font-bold tracking-wider text-white uppercase flex items-center gap-2">
             <span className="w-2 h-2 rounded-full bg-emerald-400"></span>

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Mic, Camera, Send, Sparkles, ArrowRight } from 'lucide-react';
 import { getTranslation } from '../translations';
 import { getCortevaHeroStrings } from '../corteva_translations';
+import heroFarmerImg from '../assets/images/agritech_hero_field_1791980200141.jpg';
 
 interface CortevaHeroProps {
   selectedLang: string;
@@ -19,7 +20,6 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
   isVoiceActive = false,
 }) => {
   const [inlineQuery, setInlineQuery] = useState('');
-  const [videoFailed, setVideoFailed] = useState(false);
   const heroStrings = getCortevaHeroStrings(selectedLang);
 
   const handleQuerySubmit = (e?: React.FormEvent) => {
@@ -34,31 +34,17 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
 
   return (
     <section className="relative w-full min-h-[82vh] lg:min-h-[88vh] flex items-center overflow-hidden bg-slate-950 text-white">
-      {/* 1. Cinematic Agriculture Video Background with Poster Fallback */}
+      {/* 1. Main Dashboard Hero Background: Indian farmer holding a smartphone in a crop field */}
       <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
-        {!videoFailed ? (
-          <video
-            autoPlay
-            muted
-            loop
-            playsInline
-            poster="/src/assets/images/agritech_hero_field_1791980200141.jpg"
-            onError={() => setVideoFailed(true)}
-            className="w-full h-full object-cover object-center scale-105"
-          >
-            {/* Direct Agriculture / Farmland Cinematic Footage */}
-            <source
-              src="https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-              type="video/mp4"
-            />
-          </video>
-        ) : (
-          <img
-            src="/src/assets/images/agritech_hero_field_1791980200141.jpg"
-            alt="AgreNova Agriculture Farmland"
-            className="w-full h-full object-cover object-center"
-          />
-        )}
+        <img
+          src={heroFarmerImg}
+          alt="Indian farmer holding a smartphone in a crop field - AgreNova AI"
+          className="w-full h-full object-cover object-center"
+          loading="eager"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/images/agritech_hero_field_1791980200141.jpg';
+          }}
+        />
 
         {/* 2. Professional Dark Contrast Overlays (Corteva Style: Cinematic & High Readability) */}
         <div className="absolute inset-0 bg-gradient-to-r from-slate-950/90 via-slate-950/75 to-slate-900/40 z-10" />

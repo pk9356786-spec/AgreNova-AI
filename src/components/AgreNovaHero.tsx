@@ -189,7 +189,7 @@ export const AgreNovaHero: React.FC<HeroProps> = React.memo(({
                 {/* Hero Product Photo with Overlay */}
                 <div className="relative aspect-[4/3] bg-slate-900 overflow-hidden">
                   <img
-                    src="/src/assets/images/agritech_hero_field_1791980200141.jpg"
+                    src="/images/agritech_hero_field_1791980200141.jpg"
                     alt="AgreNova Precision Agriculture Field"
                     className="w-full h-full object-cover object-center filter brightness-95"
                     loading="eager"

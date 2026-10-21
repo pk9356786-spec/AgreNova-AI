@@ -2,6 +2,8 @@ import React from 'react';
 import { Mic, Camera, RefreshCw, Share2, Sparkles, ArrowRight, Volume2, ScanLine, Droplets, Wind, Cloud, MapPin } from 'lucide-react';
 import { getTranslation } from '../translations';
 import { getCortevaCardsStrings } from '../corteva_translations';
+import voiceAssistantImg from '../assets/images/farmer_voice_assistant_1791275624675.jpg';
+import cropLeafInspectionImg from '../assets/images/crop_leaf_inspection_1791980200042.jpg';
 
 interface ThreeFeatureCardsProps {
   selectedLang: string;
@@ -98,10 +100,13 @@ export const CortevaThreeFeatureCards: React.FC<ThreeFeatureCardsProps> = React.
               {/* Agricultural Visual */}
               <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                 <img
-                  src="/src/assets/images/farmer_voice_assistant_1791275624675.jpg"
+                  src={voiceAssistantImg}
                   alt="Farmer Voice AI Assistant"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/images/farmer_voice_assistant_1791275624675.jpg';
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
                 <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-emerald-900 text-xs font-bold px-3 py-1 rounded-full border border-white/60 shadow-xs flex items-center gap-1.5">
@@ -156,10 +161,13 @@ export const CortevaThreeFeatureCards: React.FC<ThreeFeatureCardsProps> = React.
               {/* Agricultural Visual */}
               <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                 <img
-                  src="/src/assets/images/crop_leaf_inspection_1791980200042.jpg"
+                  src={cropLeafInspectionImg}
                   alt="Crop Leaf Inspection & Disease Diagnostics"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
+                  onError={(e) => {
+                    (e.target as HTMLImageElement).src = '/images/crop_leaf_inspection_1791980200042.jpg';
+                  }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
                 <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-teal-900 text-xs font-bold px-3 py-1 rounded-full border border-white/60 shadow-xs flex items-center gap-1.5">

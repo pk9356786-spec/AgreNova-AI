@@ -18,11 +18,11 @@ export const CortevaCompanySection: React.FC<CompanySectionProps> = React.memo((
   const currentYear = new Date().getFullYear();
 
   return (
-    <footer id="section-company-about" className="w-full bg-[#002C23] text-slate-200 border-t border-emerald-950 pt-16 pb-10">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-12">
+    <footer id="section-company-about" className="w-full bg-[#002C23] text-slate-200 border-t border-emerald-950 pt-12 pb-10">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-6">
         
         {/* A & B: AgreNova AI Company Introduction & Contact Information */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start pb-10 border-b border-emerald-800/60">
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
           
           {/* Brand Introduction */}
           <div className="lg:col-span-7 space-y-4">
@@ -39,7 +39,7 @@ export const CortevaCompanySection: React.FC<CompanySectionProps> = React.memo((
               {t.mission}
             </p>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2 text-xs text-emerald-200/80">
+            <div className="flex flex-wrap items-center gap-3 pt-1 text-xs text-emerald-200/80">
               <a
                 href="https://www.linkedin.com/company/agrenova-ai/"
                 target="_blank"
@@ -65,16 +65,18 @@ export const CortevaCompanySection: React.FC<CompanySectionProps> = React.memo((
 
           {/* Farmer Support & Contact */}
           <div className="lg:col-span-5 space-y-3 lg:pl-6">
-            <h4 className="text-xs font-black uppercase tracking-wider text-[#34D399]">
-              {t.helplineTitle}
-            </h4>
-            <p className="text-xs text-emerald-100/80 leading-relaxed max-w-md">
-              {t.helplineDesc}
-            </p>
+            <div>
+              <h4 className="text-xs font-black uppercase tracking-wider text-[#34D399] leading-tight pt-1">
+                {t.helplineTitle}
+              </h4>
+              <p className="text-xs text-emerald-100/80 leading-relaxed max-w-md mt-1.5">
+                {t.helplineDesc}
+              </p>
+            </div>
             <div className="pt-1">
               <a
                 href="tel:18001801551"
-                className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-black transition-colors shadow-sm cursor-pointer"
+                className="inline-flex items-center gap-2 bg-amber-400 hover:bg-amber-300 text-slate-950 px-4 py-2.5 rounded-xl text-xs font-black transition-colors shadow-sm cursor-pointer whitespace-nowrap"
               >
                 <Phone className="w-3.5 h-3.5 fill-current shrink-0" />
                 <span>{t.helplineBtn}</span>
@@ -88,7 +90,7 @@ export const CortevaCompanySection: React.FC<CompanySectionProps> = React.memo((
         <StartupEcosystemSection selectedLang={selectedLang} />
 
         {/* D. Footer Copyright Strip */}
-        <div className="pt-6 border-t border-emerald-800/60 text-xs text-emerald-200/70 font-medium text-center sm:text-left">
+        <div className="pt-5 border-t border-emerald-800/60 text-xs text-emerald-200/70 font-medium text-center sm:text-left">
           <p>
             {t.copyright.replace('2026', String(currentYear))}
           </p>
