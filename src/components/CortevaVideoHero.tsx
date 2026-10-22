@@ -21,6 +21,7 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
 }) => {
   const [inlineQuery, setInlineQuery] = useState('');
   const [videoFailed, setVideoFailed] = useState(false);
+  const [isVideoReady, setIsVideoReady] = useState(false);
   const videoRef = React.useRef<HTMLVideoElement>(null);
   const heroStrings = getCortevaHeroStrings(selectedLang);
 
@@ -29,6 +30,9 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
     if (video) {
       video.muted = true;
       video.defaultMuted = true;
+      if (video.readyState >= 2) {
+        setIsVideoReady(true);
+      }
       const playPromise = video.play();
       if (playPromise !== undefined) {
         playPromise.catch((err) => {
@@ -50,7 +54,7 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
 
   return (
     <section className="relative w-full min-h-[80vh] sm:min-h-[82vh] lg:min-h-[88vh] flex items-center overflow-hidden bg-slate-950 text-white">
-      {/* 1. Main Dashboard Hero Background Video with Fallback Poster */}
+      {/* 1. Main Dashboard Hero Background Video with Fallback Image */}
       <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none">
         {!videoFailed ? (
           <video
@@ -60,9 +64,12 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
             loop
             playsInline
             preload="auto"
-            poster={heroFarmerImg}
+            onLoadedData={() => setIsVideoReady(true)}
+            onPlaying={() => setIsVideoReady(true)}
             onError={() => setVideoFailed(true)}
-            className="w-full h-full object-cover object-[55%_35%] sm:object-[50%_40%] md:object-center"
+            className={`w-full h-full object-cover object-[55%_35%] sm:object-[50%_40%] md:object-center transition-opacity duration-300 ease-out ${
+              isVideoReady ? 'opacity-100' : 'opacity-0'
+            }`}
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           >
             <source src="/videos/agrenova-hero.mp4" type="video/mp4" />
