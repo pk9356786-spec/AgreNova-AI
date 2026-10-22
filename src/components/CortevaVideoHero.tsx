@@ -21,23 +21,23 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
 }) => {
   const [inlineQuery, setInlineQuery] = useState('');
   const [videoFailed, setVideoFailed] = useState(false);
-  const [isVideoReady, setIsVideoReady] = useState(false);
   const videoRef = React.useRef<HTMLVideoElement>(null);
+  const playAttemptedRef = React.useRef(false);
   const heroStrings = getCortevaHeroStrings(selectedLang);
 
   React.useEffect(() => {
     const video = videoRef.current;
-    if (video) {
+    if (video && !playAttemptedRef.current) {
+      playAttemptedRef.current = true;
       video.muted = true;
       video.defaultMuted = true;
-      if (video.readyState >= 2) {
-        setIsVideoReady(true);
-      }
-      const playPromise = video.play();
-      if (playPromise !== undefined) {
-        playPromise.catch((err) => {
-          console.warn('Autoplay prevented or video playback error:', err);
-        });
+      if (video.paused) {
+        const playPromise = video.play();
+        if (playPromise !== undefined) {
+          playPromise.catch((err) => {
+            console.warn('Hero video autoplay play() caught:', err);
+          });
+        }
       }
     }
   }, []);
@@ -59,17 +59,20 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
         {!videoFailed ? (
           <video
             ref={videoRef}
+            src="/videos/agrenova-hero.mp4"
             autoPlay
             muted
             loop
             playsInline
             preload="auto"
-            onLoadedData={() => setIsVideoReady(true)}
-            onPlaying={() => setIsVideoReady(true)}
+            onCanPlay={(e) => {
+              const v = e.currentTarget;
+              if (v.paused) {
+                v.play().catch(() => {});
+              }
+            }}
             onError={() => setVideoFailed(true)}
-            className={`w-full h-full object-cover object-[55%_35%] sm:object-[50%_40%] md:object-center transition-opacity duration-300 ease-out ${
-              isVideoReady ? 'opacity-100' : 'opacity-0'
-            }`}
+            className="w-full h-full object-cover object-[55%_35%] sm:object-[50%_40%] md:object-center"
             style={{ width: '100%', height: '100%', objectFit: 'cover' }}
           >
             <source src="/videos/agrenova-hero.mp4" type="video/mp4" />
