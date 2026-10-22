@@ -20,27 +20,7 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
   isVoiceActive = false,
 }) => {
   const [inlineQuery, setInlineQuery] = useState('');
-  const [videoFailed, setVideoFailed] = useState(false);
-  const videoRef = React.useRef<HTMLVideoElement>(null);
-  const playAttemptedRef = React.useRef(false);
   const heroStrings = getCortevaHeroStrings(selectedLang);
-
-  React.useEffect(() => {
-    const video = videoRef.current;
-    if (video && !playAttemptedRef.current) {
-      playAttemptedRef.current = true;
-      video.muted = true;
-      video.defaultMuted = true;
-      if (video.paused) {
-        const playPromise = video.play();
-        if (playPromise !== undefined) {
-          playPromise.catch((err) => {
-            console.warn('Hero video autoplay play() caught:', err);
-          });
-        }
-      }
-    }
-  }, []);
 
   const handleQuerySubmit = (e?: React.FormEvent) => {
     if (e) e.preventDefault();
@@ -54,40 +34,17 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
 
   return (
     <section className="relative w-full min-h-[80vh] sm:min-h-[82vh] lg:min-h-[88vh] flex items-center overflow-hidden bg-slate-950 text-white">
-      {/* 1. Main Dashboard Hero Background Video with Fallback Image */}
-      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden pointer-events-none">
-        {!videoFailed ? (
-          <video
-            ref={videoRef}
-            src="/videos/agrenova-hero.mp4#t=6"
-            autoPlay
-            muted
-            loop
-            playsInline
-            preload="auto"
-            onCanPlay={(e) => {
-              const v = e.currentTarget;
-              if (v.paused) {
-                v.play().catch(() => {});
-              }
-            }}
-            onError={() => setVideoFailed(true)}
-            className="w-full h-full object-cover object-[55%_35%] sm:object-[50%_40%] md:object-center"
-            style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-          >
-            <source src="/videos/agrenova-hero.mp4#t=6" type="video/mp4" />
-          </video>
-        ) : (
-          <img
-            src={heroFarmerImg}
-            alt="Indian farmer holding a smartphone in a crop field - AgreNova AI"
-            className="w-full h-full object-cover object-[55%_35%] sm:object-[50%_40%] md:object-center"
-            loading="eager"
-            onError={(e) => {
-              (e.target as HTMLImageElement).src = '/images/agritech_hero_field_1791980200141.jpg';
-            }}
-          />
-        )}
+      {/* 1. Main Dashboard Hero Background: Indian farmer holding a smartphone in a crop field */}
+      <div className="absolute inset-0 w-full h-full z-0 overflow-hidden">
+        <img
+          src={heroFarmerImg}
+          alt="Indian farmer holding a smartphone in a crop field - AgreNova AI"
+          className="w-full h-full object-cover object-[55%_35%] sm:object-[50%_40%] md:object-center"
+          loading="eager"
+          onError={(e) => {
+            (e.target as HTMLImageElement).src = '/images/agritech_hero_field_1791980200141.jpg';
+          }}
+        />
 
         {/* 2. Professional Dark Contrast Overlays (Corteva Style: Cinematic & High Readability) */}
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/65 via-slate-950/45 to-slate-950/70 md:bg-gradient-to-r md:from-slate-950/80 md:via-slate-950/45 md:to-transparent z-10" />
