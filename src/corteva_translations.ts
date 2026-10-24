@@ -28,13 +28,20 @@ export interface CortevaCardsTranslation {
   card1Crops: string;
   card1Title: string;
   card1Desc: string;
-  card1BtnIdle: string;
-  card1BtnListening: string;
+  card1Detail1?: string;
+  card1Detail2?: string;
+  card1Detail3?: string;
+  card1Btn?: string;
+  card1BtnIdle?: string;
+  card1BtnListening?: string;
   card2Tag: string;
   card2Sub: string;
   card2Crops: string;
   card2Title: string;
   card2Desc: string;
+  card2Detail1?: string;
+  card2Detail2?: string;
+  card2Detail3?: string;
   card2Btn: string;
   card3Tag: string;
   card3Clear: string;
@@ -291,19 +298,24 @@ export const CORTEVA_CARDS_STRINGS: Record<string, CortevaCardsTranslation> = {
     sectionTitleLine1: 'भारतीय किसानों के लिए',
     sectionTitleAccent: 'तीन प्रमुख तकनीकें',
     sectionDesc: 'आर्टिफिशियल इंटेलिजेंस, कंप्यूटर विज़न और वास्तविक समय मौसम पूर्वानुमान से हर किसान को खेत में तुरंत सही निर्णय लेने की सुविधा।',
-    card1Tag: 'प्रादेशिक वाक् परामर्श',
-    card1Sub: '10+ Indian Languages',
-    card1Crops: 'हिन्दी, पंजाबी, मराठी, गुजराती एवं अन्य भाषाएं',
-    card1Title: 'बोलकर पूछें खेती की कोई भी समस्या',
-    card1Desc: 'टाइप करने की कोई आवश्यकता नहीं। अपनी भाषा में बोलकर खाद की सही मात्रा, फसल की बीमारी और आज के मौसम की सलाह पूछें।',
-    card1BtnIdle: 'बोलकर सवाल पूछें',
-    card1BtnListening: 'सुन रहा है... (बोलें)',
-    card2Tag: 'AI विज़न डायग्नोस्टिक्स',
-    card2Sub: '100+ Crops Covered',
-    card2Crops: 'गेहूं, धान, कपास, सरसों, सोयाबीन व अन्य',
-    card2Title: 'फसल की फोटो से रोग व कीट की पहचान',
-    card2Desc: 'खेत में रोगग्रस्त पत्ती का फोटो खींचकर भेजें। AgreNova AI तुरंत फंगल, कीट और पोषक तत्वों की कमी पहचानकर जैविक व रासायनिक उपचार बताता है।',
-    card2Btn: 'फसल की फोटो भेजें',
+    card1Tag: 'मंडी बाजार भाव',
+    card1Sub: 'एगमार्कनेट व आधिकारिक MSP',
+    card1Crops: 'देशभर की मंडियों के ताजा आवक भाव',
+    card1Title: 'लाइव मंडी भाव व MSP दरें',
+    card1Desc: 'फसलों के सटीक बाजार भाव और सरकारी न्यूनतम समर्थन मूल्य (MSP) देखकर अपनी उपज बेचने का सही निर्णय लें।',
+    card1Detail1: 'फसल अनुसार ताजा मंडी भाव',
+    card1Detail2: 'मंडी व बाजार अनुसार मूल्य जानकारी',
+    card1Detail3: 'आधिकारिक न्यूनतम समर्थन मूल्य (MSP)',
+    card1Btn: 'मंडी भाव देखें',
+    card2Tag: 'सरकारी कृषि सहायता',
+    card2Sub: 'केंद्र व राज्य सरकार की योजनाएं',
+    card2Crops: 'सब्सिडी, पीएम-किसान व केसीसी मार्गदर्शन',
+    card2Title: 'किसानों के लिए सरकारी योजनाएं',
+    card2Desc: 'सरकारी कृषि योजनाओं की जानकारी लें, पात्रता शर्तें समझें और जरूरी दस्तावेज व आवेदन प्रक्रिया जानें।',
+    card2Detail1: 'प्रमुख सरकारी कृषि योजनाएं',
+    card2Detail2: 'पात्रता व जरूरी दस्तावेजों की सूची',
+    card2Detail3: 'आवेदन मार्गदर्शन व आधिकारिक पोर्टल लिंक',
+    card2Btn: 'सरकारी योजनाएं देखें',
     card3Tag: 'लाइव मौसम व पूर्वानुमान',
     card3Clear: 'साफ़ और धूप भरा मौसम',
     card3ChangeLoc: 'स्थान बदलें',
@@ -320,19 +332,24 @@ export const CORTEVA_CARDS_STRINGS: Record<string, CortevaCardsTranslation> = {
     sectionTitleLine1: 'Three Core Technologies',
     sectionTitleAccent: 'for Modern Agronomy',
     sectionDesc: 'Empowering farm-level decisions through conversational voice intelligence, instant visual pest identification, and live micro-meteorology.',
-    card1Tag: 'Multilingual Voice',
-    card1Sub: '10+ Indian Languages',
-    card1Crops: 'Hindi, Punjabi, Marathi, Gujarati & more',
-    card1Title: 'Voice AI Farming Assistance',
-    card1Desc: 'Speak naturally in your native language. Ask queries about fertilizer ratios, pest control, and weather advisories without typing.',
-    card1BtnIdle: 'Start Voice Consultation',
-    card1BtnListening: 'Listening... Speak',
-    card2Tag: 'Vision Diagnostics',
-    card2Sub: '100+ Crops Covered',
-    card2Crops: 'Wheat, Paddy, Cotton, Mustard, Soybean & more',
-    card2Title: 'Crop Disease & Pest Photo Diagnosis',
-    card2Desc: 'Capture a photo of infected leaves or stems. AgreNova AI visual intelligence analyzes diseases and prescribes certified organic and chemical management.',
-    card2Btn: 'Upload Crop Photo',
+    card1Tag: 'MARKET INTELLIGENCE',
+    card1Sub: 'AGMARKNET & OFFICIAL MSP',
+    card1Crops: 'Real-time mandi arrival rates across APMCs',
+    card1Title: 'Live Mandi Bhav & MSP Rates',
+    card1Desc: 'Track agricultural commodity prices and official Minimum Support Prices to make better-informed selling decisions.',
+    card1Detail1: 'Crop-wise mandi prices',
+    card1Detail2: 'Market-wise price information',
+    card1Detail3: 'Official MSP information',
+    card1Btn: 'Check Mandi Bhav',
+    card2Tag: 'GOVERNMENT AGRICULTURE SUPPORT',
+    card2Sub: 'CENTRAL & STATE SCHEMES',
+    card2Crops: 'Subsidies, PM-Kisan & Kisan Credit guidance',
+    card2Title: 'Government Schemes for Farmers',
+    card2Desc: 'Discover agricultural schemes, understand eligibility requirements, and explore the documents and application steps relevant to farmers.',
+    card2Detail1: 'Agricultural government schemes',
+    card2Detail2: 'Eligibility and required documents',
+    card2Detail3: 'Application guidance and official links',
+    card2Btn: 'Explore Government Schemes',
     card3Tag: 'Live Micro-Weather',
     card3Clear: 'Clear & Sunny Weather',
     card3ChangeLoc: 'Change Location',

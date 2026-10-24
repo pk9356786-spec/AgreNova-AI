@@ -2279,28 +2279,7 @@ const searchDistrict = profile?.district || "New Delhi";
                   {activeTab === 'home' && <span className="w-2 h-2 rounded-full bg-emerald-600 animate-pulse shadow-xs"></span>}
                 </button>
 
-                {/* 2. MSP दरें (MSP Rates) */}
-                <button
-                  id="menu-item-msp"
-                  onClick={() => {
-                    setActiveTab('msp');
-                    setSelectedPastReport(null);
-                    setIsMenuDrawerOpen(false);
-                  }}
-                  className={`w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
-                    activeTab === 'msp'
-                      ? 'bg-amber-50 text-amber-950 font-black border border-amber-300 ring-1 ring-amber-400/20 shadow-xs'
-                      : 'text-slate-700 hover:bg-amber-50/70 hover:text-amber-950'
-                  }`}
-                >
-                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-amber-400 to-yellow-500 text-slate-950 shadow-xs">
-                    <TrendingUp className="w-4 h-4 text-slate-950 stroke-[2.7]" />
-                  </span>
-                  <span className="flex-1">{getTranslation(selectedLang, 'nav_msp')}</span>
-                  {activeTab === 'msp' && <span className="w-2 h-2 rounded-full bg-amber-500 animate-pulse shadow-xs"></span>}
-                </button>
-
-                {/* 3. कृषि कैलकुलेटर (Agri Calculator) */}
+                {/* 2. कृषि कैलकुलेटर (Agri Calculator) */}
                 <button
                   id="menu-item-tools"
                   onClick={() => {
@@ -2319,27 +2298,6 @@ const searchDistrict = profile?.district || "New Delhi";
                   </span>
                   <span className="flex-1">{getTranslation(selectedLang, 'nav_tools')}</span>
                   {activeTab === 'tools' && <span className="w-2 h-2 rounded-full bg-teal-500 animate-pulse shadow-xs"></span>}
-                </button>
-
-                {/* 4. सरकारी योजनाएं (Govt Schemes) */}
-                <button
-                  id="menu-item-schemes"
-                  onClick={() => {
-                    setActiveTab('schemes');
-                    setSelectedPastReport(null);
-                    setIsMenuDrawerOpen(false);
-                  }}
-                  className={`w-full text-left px-3.5 py-3 rounded-xl font-bold text-sm transition-all flex items-center gap-3 cursor-pointer ${
-                    activeTab === 'schemes'
-                      ? 'bg-indigo-50 text-indigo-950 font-black border border-indigo-300 ring-1 ring-indigo-400/20 shadow-xs'
-                      : 'text-slate-700 hover:bg-indigo-50/70 hover:text-indigo-950'
-                  }`}
-                >
-                  <span className="w-8 h-8 rounded-lg flex items-center justify-center shrink-0 bg-gradient-to-br from-indigo-500 to-purple-600 text-white shadow-xs">
-                    <Award className="w-4 h-4 text-white stroke-[2.5]" />
-                  </span>
-                  <span className="flex-1">{getTranslation(selectedLang, 'nav_schemes')}</span>
-                  {activeTab === 'schemes' && <span className="w-2 h-2 rounded-full bg-indigo-500 animate-pulse shadow-xs"></span>}
                 </button>
 
                 {/* 5. जांच इतिहास (Saved History) */}
@@ -2582,10 +2540,20 @@ const searchDistrict = profile?.district || "New Delhi";
         </div>
       )}
 
-      {/* SECTION 2 — EXACTLY THREE MAIN FEATURE CARDS (Voice, Crop Photo, Live Weather) */}
+      {/* SECTION 2 — THREE MAIN FEATURE CARDS (Mandi Bhav & MSP, Govt Schemes, Live Weather) */}
       {activeTab === 'home' && (
         <CortevaThreeFeatureCards
           selectedLang={selectedLang}
+          onMandiClick={() => {
+            setActiveTab('msp');
+            setSelectedPastReport(null);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
+          onSchemesClick={() => {
+            setActiveTab('schemes');
+            setSelectedPastReport(null);
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          }}
           onVoiceClick={openVoiceModal}
           onCameraClick={openCameraModal}
           weatherAdvisory={weatherAdvisory}

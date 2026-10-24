@@ -1,14 +1,17 @@
 import React from 'react';
-import { Mic, Camera, RefreshCw, Share2, Sparkles, ArrowRight, Volume2, ScanLine, Droplets, Wind, Cloud, MapPin } from 'lucide-react';
+import { TrendingUp, Award, RefreshCw, Share2, Sparkles, ArrowRight, Droplets, Wind, Cloud, MapPin } from 'lucide-react';
 import { getTranslation } from '../translations';
 import { getCortevaCardsStrings } from '../corteva_translations';
-import voiceAssistantImg from '../assets/images/farmer_voice_assistant_1791275624675.jpg';
-import cropLeafInspectionImg from '../assets/images/crop_leaf_inspection_1791980200042.jpg';
+import mandiBhavImg from '../assets/images/01-mandi-bhav.jpeg';
+import governmentSchemesImg from '../assets/images/02-government-schemes.jpeg';
+import liveWeatherImg from '../assets/images/03-live-weather.jpeg';
 
 interface ThreeFeatureCardsProps {
   selectedLang: string;
-  onVoiceClick: () => void;
-  onCameraClick: () => void;
+  onVoiceClick?: () => void;
+  onCameraClick?: () => void;
+  onMandiClick: () => void;
+  onSchemesClick: () => void;
   weatherAdvisory: any;
   isWeatherLoading: boolean;
   weatherIsCached: boolean;
@@ -28,6 +31,8 @@ export const CortevaThreeFeatureCards: React.FC<ThreeFeatureCardsProps> = React.
   selectedLang,
   onVoiceClick,
   onCameraClick,
+  onMandiClick,
+  onSchemesClick,
   weatherAdvisory,
   isWeatherLoading,
   weatherIsCached,
@@ -39,6 +44,24 @@ export const CortevaThreeFeatureCards: React.FC<ThreeFeatureCardsProps> = React.
   isVoiceActive = false,
 }) => {
   const t = getCortevaCardsStrings(selectedLang);
+
+  // Card 1 string definitions
+  const card1Title = t.card1Title || 'Live Mandi Bhav & MSP Rates';
+  const card1Tag = t.card1Tag || 'MARKET INTELLIGENCE';
+  const card1Desc = t.card1Desc || 'Track agricultural commodity prices and official Minimum Support Prices to make better-informed selling decisions.';
+  const card1Detail1 = t.card1Detail1 || 'Crop-wise mandi prices';
+  const card1Detail2 = t.card1Detail2 || 'Market-wise price information';
+  const card1Detail3 = t.card1Detail3 || 'Official MSP information';
+  const card1Btn = t.card1Btn || 'Check Mandi Bhav';
+
+  // Card 2 string definitions
+  const card2Title = t.card2Title || 'Government Schemes for Farmers';
+  const card2Tag = t.card2Tag || 'GOVERNMENT AGRICULTURE SUPPORT';
+  const card2Desc = t.card2Desc || 'Discover agricultural schemes, understand eligibility requirements, and explore the documents and application steps relevant to farmers.';
+  const card2Detail1 = t.card2Detail1 || 'Agricultural government schemes';
+  const card2Detail2 = t.card2Detail2 || 'Eligibility and required documents';
+  const card2Detail3 = t.card2Detail3 || 'Application guidance and official links';
+  const card2Btn = t.card2Btn || 'Explore Government Schemes';
 
   // Weather condition formatting
   const rawMain = (weatherAdvisory?.debugInfo?.condition || '').trim();
@@ -94,27 +117,27 @@ export const CortevaThreeFeatureCards: React.FC<ThreeFeatureCardsProps> = React.
         {/* EXACTLY THREE MAIN FEATURE CARDS */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           
-          {/* CARD 1: VOICE AI ASSISTANCE */}
+          {/* CARD 1: LIVE MANDI BHAV & MSP RATES */}
           <div className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-xl hover:border-emerald-300 transition-all duration-300 flex flex-col justify-between group">
             <div>
               {/* Agricultural Visual */}
               <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                 <img
-                  src={voiceAssistantImg}
-                  alt="Farmer Voice AI Assistant"
+                  src={mandiBhavImg}
+                  alt={card1Title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/images/farmer_voice_assistant_1791275624675.jpg';
+                    (e.target as HTMLImageElement).src = '/images/01-mandi-bhav.jpeg';
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
-                <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-emerald-900 text-xs font-bold px-3 py-1 rounded-full border border-white/60 shadow-xs flex items-center gap-1.5">
-                  <Volume2 className="w-3.5 h-3.5 text-emerald-600" />
-                  <span>{t.card1Tag}</span>
+                <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-amber-900 text-xs font-bold px-3 py-1 rounded-full border border-white/60 shadow-xs flex items-center gap-1.5">
+                  <TrendingUp className="w-3.5 h-3.5 text-amber-600" />
+                  <span>{card1Tag}</span>
                 </div>
                 <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <span className="text-[11px] font-semibold text-emerald-200 uppercase tracking-wider block">
+                  <span className="text-[11px] font-semibold text-amber-200 uppercase tracking-wider block">
                     {t.card1Sub}
                   </span>
                   <p className="text-xs font-medium text-slate-100 truncate">
@@ -126,11 +149,27 @@ export const CortevaThreeFeatureCards: React.FC<ThreeFeatureCardsProps> = React.
               {/* Card Body */}
               <div className="p-6">
                 <h3 className="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-emerald-800 transition-colors">
-                  {t.card1Title}
+                  {card1Title}
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed font-normal">
-                  {t.card1Desc}
+                <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
+                  {card1Desc}
                 </p>
+
+                {/* Supporting Details */}
+                <ul className="space-y-2 text-xs text-slate-600 border-t border-slate-100 pt-3.5">
+                  <li className="flex items-center gap-2 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span>{card1Detail1}</span>
+                  </li>
+                  <li className="flex items-center gap-2 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span>{card1Detail2}</span>
+                  </li>
+                  <li className="flex items-center gap-2 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 shrink-0"></span>
+                    <span>{card1Detail3}</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
@@ -138,44 +177,38 @@ export const CortevaThreeFeatureCards: React.FC<ThreeFeatureCardsProps> = React.
             <div className="p-6 pt-0 border-t border-slate-100 mt-2">
               <button
                 type="button"
-                onClick={onVoiceClick}
-                className={`w-full py-3.5 px-4 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2.5 transition-all active:scale-95 shadow-sm cursor-pointer ${
-                  isVoiceActive
-                    ? 'bg-rose-600 text-white animate-pulse shadow-rose-200'
-                    : 'bg-[#047857] hover:bg-[#036446] text-white shadow-emerald-900/10'
-                }`}
-                title={getTranslation(selectedLang, 'tapToSpeak')}
+                onClick={onMandiClick}
+                className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2.5 bg-[#047857] hover:bg-[#036446] text-white shadow-emerald-900/10 transition-all active:scale-95 shadow-sm cursor-pointer"
+                title={card1Btn}
               >
-                <Mic className={`w-4 h-4 ${isVoiceActive ? 'animate-bounce' : ''}`} />
-                <span>
-                  {isVoiceActive ? t.card1BtnListening : t.card1BtnIdle}
-                </span>
+                <TrendingUp className="w-4 h-4 text-emerald-300" />
+                <span>{card1Btn}</span>
                 <ArrowRight className="w-4 h-4 ml-auto" />
               </button>
             </div>
           </div>
 
-          {/* CARD 2: CROP PHOTO ANALYSIS */}
+          {/* CARD 2: GOVERNMENT SCHEMES FOR FARMERS */}
           <div className="bg-white rounded-2xl border border-slate-200/90 overflow-hidden shadow-sm hover:shadow-xl hover:border-emerald-300 transition-all duration-300 flex flex-col justify-between group">
             <div>
               {/* Agricultural Visual */}
               <div className="relative aspect-[16/10] overflow-hidden bg-slate-100">
                 <img
-                  src={cropLeafInspectionImg}
-                  alt="Crop Leaf Inspection & Disease Diagnostics"
+                  src={governmentSchemesImg}
+                  alt={card2Title}
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   loading="lazy"
                   onError={(e) => {
-                    (e.target as HTMLImageElement).src = '/images/crop_leaf_inspection_1791980200042.jpg';
+                    (e.target as HTMLImageElement).src = '/images/02-government-schemes.jpeg';
                   }}
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-slate-950/70 via-transparent to-transparent"></div>
-                <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-teal-900 text-xs font-bold px-3 py-1 rounded-full border border-white/60 shadow-xs flex items-center gap-1.5">
-                  <ScanLine className="w-3.5 h-3.5 text-teal-600" />
-                  <span>{t.card2Tag}</span>
+                <div className="absolute top-3 left-3 bg-white/95 backdrop-blur-xs text-indigo-900 text-xs font-bold px-3 py-1 rounded-full border border-white/60 shadow-xs flex items-center gap-1.5">
+                  <Award className="w-3.5 h-3.5 text-indigo-600" />
+                  <span>{card2Tag}</span>
                 </div>
                 <div className="absolute bottom-3 left-3 right-3 text-white">
-                  <span className="text-[11px] font-semibold text-teal-200 uppercase tracking-wider block">
+                  <span className="text-[11px] font-semibold text-indigo-200 uppercase tracking-wider block">
                     {t.card2Sub}
                   </span>
                   <p className="text-xs font-medium text-slate-100 truncate">
@@ -187,11 +220,27 @@ export const CortevaThreeFeatureCards: React.FC<ThreeFeatureCardsProps> = React.
               {/* Card Body */}
               <div className="p-6">
                 <h3 className="text-xl font-extrabold text-slate-900 mb-2 group-hover:text-emerald-800 transition-colors">
-                  {t.card2Title}
+                  {card2Title}
                 </h3>
-                <p className="text-sm text-slate-600 leading-relaxed font-normal">
-                  {t.card2Desc}
+                <p className="text-sm text-slate-600 leading-relaxed font-normal mb-4">
+                  {card2Desc}
                 </p>
+
+                {/* Supporting Details */}
+                <ul className="space-y-2 text-xs text-slate-600 border-t border-slate-100 pt-3.5">
+                  <li className="flex items-center gap-2 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span>
+                    <span>{card2Detail1}</span>
+                  </li>
+                  <li className="flex items-center gap-2 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span>
+                    <span>{card2Detail2}</span>
+                  </li>
+                  <li className="flex items-center gap-2 font-medium">
+                    <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0"></span>
+                    <span>{card2Detail3}</span>
+                  </li>
+                </ul>
               </div>
             </div>
 
@@ -199,19 +248,33 @@ export const CortevaThreeFeatureCards: React.FC<ThreeFeatureCardsProps> = React.
             <div className="p-6 pt-0 border-t border-slate-100 mt-2">
               <button
                 type="button"
-                onClick={onCameraClick}
+                onClick={onSchemesClick}
                 className="w-full py-3.5 px-4 rounded-xl font-extrabold text-sm flex items-center justify-center gap-2.5 bg-slate-900 hover:bg-slate-800 text-white transition-all active:scale-95 shadow-sm cursor-pointer"
-                title={getTranslation(selectedLang, 'uploadPhoto')}
+                title={card2Btn}
               >
-                <Camera className="w-4 h-4 text-emerald-400" />
-                <span>{t.card2Btn}</span>
+                <Award className="w-4 h-4 text-emerald-400" />
+                <span>{card2Btn}</span>
                 <ArrowRight className="w-4 h-4 ml-auto" />
               </button>
             </div>
           </div>
 
           {/* CARD 3: LIVE WEATHER INTEGRATION */}
-          <div className="bg-gradient-to-br from-[#062c1f] via-[#043324] to-[#021f15] text-white rounded-2xl border border-emerald-600/40 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative">
+          <div className="bg-white text-white rounded-2xl border border-emerald-600/40 overflow-hidden shadow-sm hover:shadow-xl transition-all duration-300 flex flex-col justify-between group relative">
+            {/* Live Weather Card Background Image with solid white base */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none z-0 bg-white">
+              <img
+                src={liveWeatherImg}
+                alt="Live Micro-Weather"
+                className="w-full h-full object-cover object-center group-hover:scale-105 transition-transform duration-700"
+                loading="lazy"
+                onError={(e) => {
+                  (e.target as HTMLImageElement).src = '/images/03-live-weather.jpeg';
+                }}
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-slate-950/80 via-slate-950/35 to-slate-950/55"></div>
+            </div>
+
             <div className="p-6 relative z-10">
               
               {/* Header Badge & Action Controls */}

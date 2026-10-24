@@ -65,8 +65,20 @@ export const CortevaVideoHero: React.FC<CortevaHeroProps> = React.memo(({
 
           {/* Large Hero Headline */}
           <h1 className="text-2xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight sm:leading-none drop-shadow-sm">
-            {heroStrings.headingLine1} <span className="text-[#34D399]">{heroStrings.headingAccent}</span> <br />
-            {heroStrings.headingLine2}
+            {selectedLang === 'en' ? (
+              <>
+                <span className="block">Precision Crop Protection</span>
+                <span className="block">
+                  &amp; <span className="text-[#34D399]">Smart Agronomy</span> with
+                </span>
+                <span className="block">AI</span>
+              </>
+            ) : (
+              <>
+                {heroStrings.headingLine1} <span className="text-[#34D399]">{heroStrings.headingAccent}</span> <br />
+                {heroStrings.headingLine2}
+              </>
+            )}
           </h1>
 
           {/* Supporting Description */}
